@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.filedialog
 import tkinter.messagebox
-
+from PyQt5 import QtWidgets
 import PIL
 from PIL import Image, ImageTk
 
@@ -37,6 +37,7 @@ def displayBMP(bitmap_path):
     bmp_label = Label(initial_frame, image=bitmap_to_display)
     bmp_label.pack()
     print("bitmap displayed with path: " + bitmap_path)
+
 
 ###############################################################################
 # ROOT WINDOW CONFIGURATION
