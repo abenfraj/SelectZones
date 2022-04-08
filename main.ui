@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1092</width>
-    <height>840</height>
+    <width>1883</width>
+    <height>953</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QPushButton" name="quit_button">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>10</y>
-      <width>93</width>
+      <x>1500</x>
+      <y>20</y>
+      <width>341</width>
       <height>28</height>
      </rect>
     </property>
@@ -30,9 +30,9 @@
    <widget class="QPushButton" name="select_bitmap_button">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>201</width>
+      <x>60</x>
+      <y>20</y>
+      <width>341</width>
       <height>31</height>
      </rect>
     </property>
@@ -40,20 +40,52 @@
      <string>Select bitmap from file explorer</string>
     </property>
    </widget>
-   <widget class="QLabel" name="bitmap_label">
+   <widget class="QScrollArea" name="scrollArea">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>90</y>
-      <width>1051</width>
+      <x>10</x>
+      <y>70</y>
+      <width>1861</width>
       <height>691</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="widgetResizable">
+     <bool>true</bool>
     </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
+    <widget class="QWidget" name="scrollAreaWidgetContents_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1859</width>
+       <height>689</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="bitmap_label">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="save_bmp_data_button">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>780</y>
+      <width>331</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Save Bitmap Data</string>
     </property>
    </widget>
   </widget>
@@ -62,7 +94,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1092</width>
+     <width>1883</width>
      <height>26</height>
     </rect>
    </property>
