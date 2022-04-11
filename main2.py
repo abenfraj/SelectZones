@@ -1,6 +1,7 @@
 import pathlib
 import numpy as np
 from PIL import Image
+from PIL.Image import Resampling
 from PIL.ImageQt import ImageQt
 from PyQt5 import uic, QtGui, QtWidgets, QtCore
 from PyQt5.QtGui import QPixmap
@@ -18,8 +19,7 @@ class UI(QMainWindow):
         super(UI, self).__init__()
 
         # Initialize the UI component variables
-        self.image_height = None
-        self.image_width = None
+        self.bitmap_image = None
         self.bitmap_data = None
         self.save_bmp_data_button = None
         self.pixmap = None
@@ -59,17 +59,19 @@ class UI(QMainWindow):
                                                   "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
                                                   )  # Get the file name from the file explorer
         if fileName:
-            im = Image.open(fileName)
-            print(im.size)
+            self.bitmap_image = Image.open(fileName)
+            self.bitmap_data = asarray(self.bitmap_image)
+
+            resized_image = self.bitmap_image.resize(
+                (self.bitmap_label.width(), self.bitmap_label.height()),
+                resample=Resampling.BILINEAR)
+            resized_image.save("_resized.bmp")
             # TODO : DeprecationWarning: FLIP_LEFT_RIGHT is deprecated and will be removed in Pillow 10 (2023-07-01). Use Transpose.FLIP_LEFT_RIGHT instead
             # im = im.transpose(method=Image.FLIP_LEFT_RIGHT)
-            self.image_height = im.height
-            self.image_width = im.width
-            print(self.image_height)
-            self.bitmap_data = asarray(im)
-            self.pixmap = QPixmap(fileName)
+
+            self.pixmap = QPixmap("_resized.bmp")
             self.bitmap_label.setPixmap(self.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
-            im.close()
+            self.bitmap_image.close()
 
     # Save the bitmap data to a file
     # @param self The object pointer
