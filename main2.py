@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QPushButton,
 from numpy import asarray
 
 from mouse_tracker import MouseTracker
+from scroll_area import Scroller
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -50,6 +51,7 @@ class UI(QMainWindow):
         self.save_bmp_data_button = self.findChild(QPushButton, "save_bmp_data_button")
         self.centralwidget = self.findChild(QWidget, "centralwidget")
         self.scrollArea = self.findChild(QScrollArea, "scrollArea")
+        self.scrollArea = Scroller()
         self.mousetracker_label = self.findChild(QLabel, "mousetracker_label")
         self.scrollAreaWidgetContents = self.findChild(QWidget, "scrollAreaWidgetContents")
         self.mouse_tracker = MouseTracker(self.bitmap_label)
@@ -115,23 +117,24 @@ class UI(QMainWindow):
     def wheelEvent(self, event: QWheelEvent):
         if self.bitmap_label is not None:
             if event.angleDelta().y() > 0:
-                self.on_zoom_in(event)
-                # self.resize_image()
+                if self.bitmap_image is not None:
+                    self.on_zoom_in(event)
             else:
-                self.on_zoom_out(event)
-                # self.resize_image()
+                if self.bitmap_image is not None:
+                    self.on_zoom_out(event)
 
     def on_zoom_in(self, event):
         self.scale *= 2
+        self.resize_image()
 
     def on_zoom_out(self, event):
         self.scale /= 2
+        self.resize_image()
 
-    # TODO : have to fix this
     def resize_image(self):
         size = self.pixmap.size()
         scaled_pixmap = self.pixmap.scaled(self.scale * size)
-        self.label.setPixmap(scaled_pixmap)
+        self.bitmap_label.setPixmap(scaled_pixmap)
 
 
 if __name__ == "__main__":
