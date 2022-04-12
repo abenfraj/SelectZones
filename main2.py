@@ -1,12 +1,14 @@
 import pathlib
 from PIL import Image
 from PIL.Image import Resampling
-from PyQt5 import uic
+from PyQt5 import uic, QtCore
 from PyQt5.QtGui import QPixmap, QWheelEvent
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QPushButton, QLabel
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QPushButton, QLabel, QWidget, QScrollArea
 
 # To prevent the following error: "Image size (460000000 pixels) exceeds limit of 178956970 pixels, could be decompression bomb DOS attack"
 from numpy import asarray
+
+from mouse_tracker import MouseTracker
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -18,6 +20,8 @@ class UI(QMainWindow):
 
         # Initialize the UI component variables
         self.mousetracker_label = None
+        self.label_position = None
+        self.mouse_tracker = None
         self.image_is_displayed = False
         self.bitmap_image = None
         self.bitmap_data = None
@@ -26,13 +30,15 @@ class UI(QMainWindow):
         self.select_bitmap_button = None
         self.quit_button = None
         self.bitmap_label = None
+        self.scrollAreaWidgetContents = None
+        self.scrollArea = None
+        self.centralwidget = None
 
         self.scale = 1.0
 
         uic.loadUi(str(pathlib.Path(__file__).parent.resolve()) + "\\main.ui", self)  # Load the UI file
         self.retranslateUi()  # Translate the UI components into Python Objects
         self.connectAllWidgets()  # Connect all the UI components to their respective functions
-        self.setMouseTracking(True)  # Enable mouse tracking
         self.show()  # Show the main window
 
     # Function to translate the main window's UI components into Python Objects
@@ -42,7 +48,11 @@ class UI(QMainWindow):
         self.select_bitmap_button = self.findChild(QPushButton, "select_bitmap_button")
         self.bitmap_label = self.findChild(QLabel, "bitmap_label")
         self.save_bmp_data_button = self.findChild(QPushButton, "save_bmp_data_button")
+        self.centralwidget = self.findChild(QWidget, "centralwidget")
+        self.scrollArea = self.findChild(QScrollArea, "scrollArea")
         self.mousetracker_label = self.findChild(QLabel, "mousetracker_label")
+        self.scrollAreaWidgetContents = self.findChild(QWidget, "scrollAreaWidgetContents")
+        self.mouse_tracker = MouseTracker(self.bitmap_label)
 
     # Function to connect all the UI components to their respective functions
     # @param self The object pointer
@@ -52,6 +62,8 @@ class UI(QMainWindow):
         self.quit_button.clicked.connect(self.close)  # Connect the quit button to the close function from QMainWindow
         self.save_bmp_data_button.clicked.connect(
             self.saveBmpData)  # Connect the save bitmap data button to the saveBmpData function
+        self.mouse_tracker.positionChanged.connect(
+            self.on_positionChanged)  # Connect the mouse tracker to the on_positionChanged function
 
     # Select BMP file from file explorer and directly display it
     # @param self The object pointer
@@ -96,16 +108,9 @@ class UI(QMainWindow):
                     file.write(str_iteration)
             file.close()
 
-    def mouseMoveEvent(self, e):
-        # TODO : static values, have to make it dynamic
-        x = e.x() - 22
-        y = e.y() - 82
-        text = f'x: {x},  y: {y}'
-        if x < 0 or y < 0 or x >= self.bitmap_label.width() or y >= self.bitmap_label.height() or not self.image_is_displayed:
-            self.mousetracker_label.setHidden(True)
-        else:
-            self.mousetracker_label.setHidden(False)
-            self.mousetracker_label.setText(text)
+    @QtCore.pyqtSlot(QtCore.QPoint)
+    def on_positionChanged(self, pos):
+        self.mousetracker_label.setText("x: %d, y: %d" % (pos.x(), pos.y()))
 
     def wheelEvent(self, event: QWheelEvent):
         if self.bitmap_label is not None:
