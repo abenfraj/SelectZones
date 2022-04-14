@@ -4,79 +4,91 @@ from bitmap_label import BitmapLabel
 from mouse_tracker import MouseTracker
 
 
+# This class is used to create the interface for the application.
 class Ui_SelectZones(object):
+    # Initialize each of the widgets in the interface.
     def __init__(self):
-        self.centralwidget = None
-        self.quit_button = None
-        self.quit_button = None
-        self.select_bitmap_button = None
-        self.scrollArea = None
-        self.scrollAreaWidgetContents_2 = None
-        self.verticalLayout = None
-        self.save_bmp_data_button = None
-        self.bitmap_label = None
-        self.mousetracker_label = None
-        self.statusbar = None
-        self.mouse_tracker = None
+        self.centralwidget = None  # type QtWidgets.QWidget
+        self.quit_button = None  # type QtWidgets.QPushButton
+        self.quit_button = None  # type QtWidgets.QPushButton
+        self.select_bitmap_button = None  # type QtWidgets.QPushButton
+        self.scrollArea = None  # type QtWidgets.QScrollArea
+        self.scrollAreaWidgetContents = None  # type QtWidgets.QWidget
+        self.verticalLayout = None  # type QtWidgets.QVBoxLayout
+        self.save_bmp_data_button = None  # type QtWidgets.QPushButton
+        self.bitmap_label = None  # type QWidget.QLabel
+        self.mousetracker_label = None  # type MouseTracker
+        self.statusbar = None  # type QtWidgets.QStatusBar
+        self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
 
+    # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
         _translate = QtCore.QCoreApplication.translate
-        SelectZones.setWindowTitle(_translate("SelectZones", "SelectZones"))
-        self.quit_button.setText(_translate("SelectZones", "Quit"))
-        self.select_bitmap_button.setText(_translate("SelectZones", "Choose Bitmap"))
-        self.save_bmp_data_button.setText(_translate("SelectZones", "Save Bitmap Data"))
+        SelectZones.setWindowTitle(_translate("SelectZones", "SelectZones"))  # Set the title of the window.
+        self.quit_button.setText(_translate("SelectZones", "Quit"))  # Set the text of the quit button.
+        self.select_bitmap_button.setText(
+            _translate("SelectZones", "Choose Bitmap"))  # Set the text of the select bitmap button.
+        self.save_bmp_data_button.setText(
+            _translate("SelectZones", "Save Bitmap Data"))  # Set the text of the save bitmap data button.
 
+    # This function is used to set up the interface.
     def setupUi(self, SelectZones):
-        SelectZones.setObjectName("SelectZones")
-        SelectZones.resize(1920, 1080)
-        self.centralwidget = QtWidgets.QWidget(SelectZones)
-        self.centralwidget.setObjectName("centralwidget")
+        SelectZones.setObjectName("SelectZones")  # Set the name of the window.
+        SelectZones.resize(1920, 1080)  # Set the size of the window.
+        self.centralwidget = QtWidgets.QWidget(SelectZones)  # Create the central widget.
+        self.centralwidget.setObjectName("centralwidget")  # Set the name of the central widget.
 
-        self.quit_button = QtWidgets.QPushButton(self.centralwidget)
-        self.quit_button.setGeometry(QtCore.QRect(1500, 20, 341, 28))
-        self.quit_button.setObjectName("quit_button")
+        self.quit_button = QtWidgets.QPushButton(self.centralwidget)  # Create the quit button.
+        self.quit_button.setGeometry(QtCore.QRect(1500, 20, 341, 28))  # Set the geometry of the quit button.
+        self.quit_button.setObjectName("quit_button")  # Set the name of the quit button.
 
-        self.select_bitmap_button = QtWidgets.QPushButton(self.centralwidget)
-        self.select_bitmap_button.setGeometry(QtCore.QRect(60, 20, 341, 31))
-        self.select_bitmap_button.setObjectName("select_bitmap_button")
+        self.select_bitmap_button = QtWidgets.QPushButton(self.centralwidget)  # Create the select bitmap button.
+        self.select_bitmap_button.setGeometry(
+            QtCore.QRect(60, 20, 341, 31))  # Set the geometry of the select bitmap button.
+        self.select_bitmap_button.setObjectName("select_bitmap_button")  # Set the name of the select bitmap button.
 
-        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
-        self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
+        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)  # Create the scroll area.
+        self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))  # Set the geometry of the scroll area.
+        self.scrollArea.setWidgetResizable(True)  # Set the scroll area to be resizable.
+        self.scrollArea.setObjectName("scrollArea")  # Set the name of the scroll area.
 
-        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 1859, 389))
-        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()  # Create the scroll area widget contents.
+        self.scrollAreaWidgetContents.setGeometry(
+            QtCore.QRect(0, 0, 1859, 389))  # Set the geometry of the scroll area widget contents.
+        self.scrollAreaWidgetContents.setObjectName(
+            "scrollAreaWidgetContents")  # Set the name of the scroll area widget contents.
 
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)  # Create the vertical layout.
+        self.verticalLayout.setObjectName("verticalLayout")  # Set the name of the vertical layout.
 
-        self.bitmap_label = BitmapLabel()
-        self.bitmap_label.setText("")
-        self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.bitmap_label.setObjectName("bitmap_label")
+        self.bitmap_label = BitmapLabel()  # Create the bitmap label.
+        self.bitmap_label.setText("")  # Set the text of the bitmap label.
+        self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)  # Set the alignment of the bitmap label.
+        self.bitmap_label.setObjectName("bitmap_label")  # Set the name of the bitmap label.
 
-        self.verticalLayout.addWidget(self.bitmap_label)
+        self.verticalLayout.addWidget(self.bitmap_label)  # Add the bitmap label to the vertical layout.
 
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents_2)
+        self.scrollArea.setWidget(
+            self.scrollAreaWidgetContents)  # Set the scroll area to the scroll area widget contents.
 
-        self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)
-        self.save_bmp_data_button.setGeometry(QtCore.QRect(780, 780, 331, 28))
-        self.save_bmp_data_button.setObjectName("save_bmp_data_button")
+        self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)  # Create the save bitmap data button.
+        self.save_bmp_data_button.setGeometry(
+            QtCore.QRect(780, 780, 331, 28))  # Set the geometry of the save bitmap data button.
+        self.save_bmp_data_button.setObjectName("save_bmp_data_button")  # Set the name of the save bitmap data button.
 
-        self.mousetracker_label = QtWidgets.QLabel(self.centralwidget)
-        self.mousetracker_label.setGeometry(QtCore.QRect(780, 40, 141, 16))
-        self.mousetracker_label.setText("")
-        self.mousetracker_label.setObjectName("mousetracker_label")
+        self.mousetracker_label = QtWidgets.QLabel(self.centralwidget)  # Create the mouse tracker label.
+        self.mousetracker_label.setGeometry(
+            QtCore.QRect(780, 40, 141, 16))  # Set the geometry of the mouse tracker label.
+        self.mousetracker_label.setText("")  # Set the text of the mouse tracker label.
+        self.mousetracker_label.setObjectName("mousetracker_label")  # Set the name of the mouse tracker label.
 
-        SelectZones.setCentralWidget(self.centralwidget)
+        SelectZones.setCentralWidget(self.centralwidget)  # Set the central widget to the window.
 
-        self.statusbar = QtWidgets.QStatusBar(SelectZones)
-        self.statusbar.setObjectName("statusbar")
-        SelectZones.setStatusBar(self.statusbar)
+        self.statusbar = QtWidgets.QStatusBar(SelectZones)  # Create the status bar.
+        self.statusbar.setObjectName("statusbar")  # Set the name of the status bar.
+        SelectZones.setStatusBar(self.statusbar)  # Set the status bar to the window.
 
-        self.mouse_tracker = MouseTracker(self.bitmap_label)
+        self.mouse_tracker = MouseTracker(self.bitmap_label)  # Create the mouse tracker.
 
-        self.retranslateUi(SelectZones)
-        QtCore.QMetaObject.connectSlotsByName(SelectZones)
+        self.retranslateUi(SelectZones)  # Translate the UI.
+        QtCore.QMetaObject.connectSlotsByName(SelectZones)  # Connect the slots.
