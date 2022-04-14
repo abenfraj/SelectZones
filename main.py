@@ -1,8 +1,15 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-from grid_manager import GridWindow
+from PyQt5 import QtWidgets
+
+from event_manager import Event_Manager
+from interface_setup import Ui_SelectZones
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)  # Start Qt application
-    main_window = GridWindow()  # Create main window
-    sys.exit(app.exec_())  # Start event loop
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    SelectZones = QtWidgets.QMainWindow()
+    ui = Ui_SelectZones()
+    ui.setupUi(SelectZones)
+    SelectZones.show()
+    event_manager = Event_Manager(ui)
+    sys.exit(app.exec_())

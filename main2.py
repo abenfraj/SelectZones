@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QPushButton,
 from numpy import asarray
 
 from mouse_tracker import MouseTracker
-from scroll_area import Scroller
+from zone_selection import BitmapLabel
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -51,7 +51,6 @@ class UI(QMainWindow):
         self.save_bmp_data_button = self.findChild(QPushButton, "save_bmp_data_button")
         self.centralwidget = self.findChild(QWidget, "centralwidget")
         self.scrollArea = self.findChild(QScrollArea, "scrollArea")
-        self.scrollArea = Scroller()
         self.mousetracker_label = self.findChild(QLabel, "mousetracker_label")
         self.scrollAreaWidgetContents = self.findChild(QWidget, "scrollAreaWidgetContents")
         self.mouse_tracker = MouseTracker(self.bitmap_label)
@@ -118,16 +117,16 @@ class UI(QMainWindow):
         if self.bitmap_label is not None:
             if event.angleDelta().y() > 0:
                 if self.bitmap_image is not None:
-                    self.on_zoom_in(event)
+                    self.on_zoom_in()
             else:
                 if self.bitmap_image is not None:
-                    self.on_zoom_out(event)
+                    self.on_zoom_out()
 
-    def on_zoom_in(self, event):
+    def on_zoom_in(self):
         self.scale *= 2
         self.resize_image()
 
-    def on_zoom_out(self, event):
+    def on_zoom_out(self):
         self.scale /= 2
         self.resize_image()
 
