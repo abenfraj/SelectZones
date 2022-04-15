@@ -1,4 +1,6 @@
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QScrollArea
 
 from bitmap_label import BitmapLabel
 from mouse_tracker import MouseTracker
@@ -25,6 +27,7 @@ class Ui_SelectZones(object):
     def retranslateUi(self, SelectZones):
         _translate = QtCore.QCoreApplication.translate
         SelectZones.setWindowTitle(_translate("SelectZones", "SelectZones"))  # Set the title of the window.
+        SelectZones.setWindowIcon(QIcon("CNRS_logo.png"))  # Set the icon of the window.
         self.quit_button.setText(_translate("SelectZones", "Quit"))  # Set the text of the quit button.
         self.select_bitmap_button.setText(
             _translate("SelectZones", "Choose Bitmap"))  # Set the text of the select bitmap button.
@@ -47,7 +50,7 @@ class Ui_SelectZones(object):
             QtCore.QRect(60, 20, 341, 31))  # Set the geometry of the select bitmap button.
         self.select_bitmap_button.setObjectName("select_bitmap_button")  # Set the name of the select bitmap button.
 
-        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)  # Create the scroll area.
+        self.scrollArea = QScrollArea(self.centralwidget)  # Create the scroll area.
         self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))  # Set the geometry of the scroll area.
         self.scrollArea.setWidgetResizable(True)  # Set the scroll area to be resizable.
         self.scrollArea.setObjectName("scrollArea")  # Set the name of the scroll area.

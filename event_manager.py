@@ -74,4 +74,10 @@ class Event_Manager(QMainWindow):
     @QtCore.pyqtSlot(QtCore.QPoint)
     # This function is used to update the mouse tracker label
     def on_positionChanged(self, pos):
-        self.ui.mousetracker_label.setText("x: %d, y: %d" % (pos.x(), pos.y()))  # Update the mouse tracker label
+        try:
+            real_width, real_height = self.ui.bitmap_image.size
+            self.ui.mousetracker_label.setText("x: %d, y: %d" % (
+                real_width * pos.x() / self.ui.bitmap_label.size().width(),
+                real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label
+        except AttributeError:
+            pass
