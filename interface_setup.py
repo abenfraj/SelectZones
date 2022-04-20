@@ -12,16 +12,18 @@ class Ui_SelectZones(object):
     def __init__(self):
         self.centralwidget = None  # type QtWidgets.QWidget
         self.quit_button = None  # type QtWidgets.QPushButton
-        self.quit_button = None  # type QtWidgets.QPushButton
+        self.flip_image_button = None  # type QtWidgets.QPushButton
         self.select_bitmap_button = None  # type QtWidgets.QPushButton
         self.scrollArea = None  # type QtWidgets.QScrollArea
         self.scrollAreaWidgetContents = None  # type QtWidgets.QWidget
         self.verticalLayout = None  # type QtWidgets.QVBoxLayout
         self.save_bmp_data_button = None  # type QtWidgets.QPushButton
         self.bitmap_label = None  # type QWidget.QLabel
+        self.bitmap_data = None  # type list
         self.mousetracker_label = None  # type MouseTracker
         self.statusbar = None  # type QtWidgets.QStatusBar
         self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
+        self.image_is_displayed = False  # type bool
 
     # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
@@ -31,6 +33,7 @@ class Ui_SelectZones(object):
         self.quit_button.setText(_translate("SelectZones", "Quit"))  # Set the text of the quit button.
         self.select_bitmap_button.setText(
             _translate("SelectZones", "Choose Bitmap"))  # Set the text of the select bitmap button.
+        self.flip_image_button.setText(_translate("SelectZones", "Flip Image"))  # Set the text of the flip image button.
         self.save_bmp_data_button.setText(
             _translate("SelectZones", "Save Bitmap Data"))  # Set the text of the save bitmap data button.
 
@@ -49,6 +52,12 @@ class Ui_SelectZones(object):
         self.select_bitmap_button.setGeometry(
             QtCore.QRect(60, 20, 341, 31))  # Set the geometry of the select bitmap button.
         self.select_bitmap_button.setObjectName("select_bitmap_button")  # Set the name of the select bitmap button.
+
+        self.flip_image_button = QtWidgets.QPushButton(self.centralwidget)  # Create the flip image button.
+        self.flip_image_button.setGeometry(
+            QtCore.QRect(420, 20, 341, 31))  # Set the geometry of the flip image button.
+        self.flip_image_button.setObjectName("flip_image_button")  # Set the name of the flip image button.
+        self.flip_image_button.setEnabled(False)  # Disable the flip image button.
 
         self.scrollArea = QScrollArea(self.centralwidget)  # Create the scroll area.
         self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))  # Set the geometry of the scroll area.

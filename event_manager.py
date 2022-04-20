@@ -1,9 +1,8 @@
 from PIL import Image
-from PIL.Image import Resampling
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtGui import QPixmap, QWheelEvent
-from PyQt5.QtWidgets import QFileDialog, QWidget, QMainWindow
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QFileDialog, QMainWindow
 from numpy import asarray
 
 Image.MAX_IMAGE_PIXELS = None
@@ -30,28 +29,30 @@ class Event_Manager(QMainWindow):
 
     # This function is used to open the file dialog
     def openFileDialog(self):
+        if self.ui.bitmap_label.bitmap_image is not None:  # If the bitmap image is not None
+            self.ui.bitmap_label.bitmap_image.close()  # Close the bitmap image
         fileName, _ = QFileDialog.getOpenFileName(self,
                                                   "Open File",
                                                   "D:\\Workspace\\LERMA\\SelectZones",
                                                   "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
                                                   )  # Get the file name from the file explorer
         if fileName:  # If the file name is not empty
-            self.ui.bitmap_image = Image.open(fileName)  # Open the image
-            self.ui.bitmap_data = asarray(self.ui.bitmap_image)  # Convert the image to a numpy array
+            self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
+            self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
 
-            resized_image = self.ui.bitmap_image.resize(
-                (self.ui.bitmap_label.width(), self.ui.bitmap_label.height()),
-                resample=Resampling.BILINEAR)  # Resize the image to fit the bitmap label
+            resized_image = self.ui.bitmap_label.bitmap_image.resize(
+                (4600, 1000),
+                QtCore.Qt.KeepAspectRatio)  # Resize the image to fit the bitmap label
             resized_image.save("_resized.bmp")  # Save the resized image
             self.ui.bitmap_label.bitmap_image = resized_image  # Set the bitmap label to the resized image
-            # TODO : DeprecationWarning: FLIP_LEFT_RIGHT is deprecaqted and will be removed in Pillow 10 (2023-07-01). Use Transpose.FLIP_LEFT_RIGHT instead
-            # im = im.transpose(method=Image.FLIP_LEFT_RIGHT)
-
             self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
             self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
             self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
-            self.ui.bitmap_image.close()  # Close the image
-            self.ui.image_is_displayed = True  # Set the image is displayed attribute to True
+            if self.ui.image_is_displayed is False:  # If the image is not displayed
+                self.ui.flip_image_button.setEnabled(True)  # Enable the flip image button
+                self.ui.flip_image_button.clicked.connect(
+                    self.flip_image)  # Connect the flip image button to the flip_image function
+                self.ui.image_is_displayed = True  # Set the image is displayed attribute to True
 
     # This function is used to save the bitmap data
     def saveBmpData(self):
@@ -81,3 +82,13 @@ class Event_Manager(QMainWindow):
                 real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label
         except AttributeError:
             pass
+
+    def flip_image(self):
+        self.ui.bitmap_data = self.ui.bitmap_data[::-1]  # Flip the bitmap data
+        # TODO : DeprecationWarning: FLIP_LEFT_RIGHT is deprecated and will be removed in Pillow 10 (2023-07-01). Use Transpose.FLIP_LEFT_RIGHT instead
+        self.ui.bitmap_label.bitmap_image = self.ui.bitmap_label.bitmap_image.transpose(
+            method=Image.FLIP_LEFT_RIGHT)  # Flip the image
+        self.ui.bitmap_label.bitmap_image.save("_resized.bmp")  # Save the flipped image
+        self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
+        self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
+        self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
