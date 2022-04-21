@@ -1,65 +1,103 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import Qt, QPoint, QRect
-from PyQt5.QtGui import QPixmap, QPainter
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+FREE_STATE = 1
+BUILDING_SQUARE = 2
+BEGIN_SIDE_EDIT = 3
+END_SIDE_EDIT = 4
+
+CURSOR_ON_BEGIN_SIDE = 1
+CURSOR_ON_END_SIDE = 2
 
 
-class MyApp(QWidget):
+class MyWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.window_width, self.window_height = 1200, 800
-        self.setMinimumSize(self.window_width, self.window_height)
+        self.setGeometry(30, 30, 600, 400)
+        self.begin = QPoint()
+        self.end = QPoint()
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-
-        self.pix = QPixmap(self.rect().size())
-        self.pix.fill(Qt.white)
-
-        self.begin, self.destination = QPoint(), QPoint()
+        self.state = FREE_STATE
+        self.setMouseTracking(True)
+        self.free_cursor_on_side = 0
 
     def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.drawPixmap(QPoint(), self.pix)
+        qp = QPainter(self)
+        br = QBrush(QColor(100, 10, 10, 40))
+        qp.setBrush(br)
+        qp.drawRect(QRect(self.begin, self.end))
 
-        if not self.begin.isNull() and not self.destination.isNull():
-            rect = QRect(self.begin, self.destination)
-            painter.drawRect(rect.normalized())
+        if not self.free_cursor_on_side:
+            return
+
+        qp.setPen(QPen(Qt.black, 5, Qt.DashLine))
+        if self.free_cursor_on_side == CURSOR_ON_BEGIN_SIDE:
+            end = QPoint(self.end)
+            end.setX(self.begin.x())
+            qp.drawLine(self.begin, end)
+
+        elif self.free_cursor_on_side == CURSOR_ON_END_SIDE:
+            begin = QPoint(self.begin)
+            begin.setX(self.end.x())
+            qp.drawLine(self.end, begin)
+
+    def cursor_on_side(self, e_pos) -> int:
+        if not self.begin.isNull() and not self.end.isNull():
+            y1, y2 = sorted([self.begin.y(), self.end.y()])
+            if y1 <= e_pos.y() <= y2:
+
+                # 5 resolution, more easy to pick than 1px
+                if abs(self.begin.x() - e_pos.x()) <= 5:
+                    return CURSOR_ON_BEGIN_SIDE
+                elif abs(self.end.x() - e_pos.x()) <= 5:
+                    return CURSOR_ON_END_SIDE
+
+        return 0
 
     def mousePressEvent(self, event):
-        if event.buttons() & Qt.LeftButton:
-            print('Point 1')
+        side = self.cursor_on_side(event.pos())
+        if side == CURSOR_ON_BEGIN_SIDE:
+            self.state = BEGIN_SIDE_EDIT
+        elif side == CURSOR_ON_END_SIDE:
+            self.state = END_SIDE_EDIT
+        else:
+            self.state = BUILDING_SQUARE
+
             self.begin = event.pos()
-            self.destination = self.begin
+            self.end = event.pos()
             self.update()
 
+    def applye_event(self, event):
+        if self.state == BUILDING_SQUARE:
+            self.end = event.pos()
+        elif self.state == BEGIN_SIDE_EDIT:
+            self.begin.setX(event.x())
+        elif self.state == END_SIDE_EDIT:
+            self.end.setX(event.x())
+
     def mouseMoveEvent(self, event):
-        if event.buttons() & Qt.LeftButton:
-            print('Point 2')
-            self.destination = event.pos()
+        if self.state == FREE_STATE:
+            self.free_cursor_on_side = self.cursor_on_side(event.pos())
+            if self.free_cursor_on_side:
+                self.setCursor(Qt.SizeHorCursor)
+            else:
+                self.unsetCursor()
+            self.update()
+        else:
+            self.applye_event(event)
             self.update()
 
     def mouseReleaseEvent(self, event):
-        print('Point 3')
-        if event.button() & Qt.LeftButton:
-            rect = QRect(self.begin, self.destination)
-            painter = QPainter(self.pix)
-            painter.drawRect(rect.normalized())
-
-            self.begin, self.destination = QPoint(), QPoint()
-            self.update()
+        self.applye_event(event)
+        self.state = FREE_STATE
 
 
 if __name__ == '__main__':
-    # don't auto scale when drag app to a different monitor.
-    # QApplication.setAttribute(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
-
     app = QApplication(sys.argv)
-
-    myApp = MyApp()
-    myApp.show()
-
-    try:
-        sys.exit(app.exec_())
-    except SystemExit:
-        print('Closing Window...')
+    window = MyWidget()
+    window.show()
+    app.aboutToQuit.connect(app.deleteLater)
+    sys.exit(app.exec_())

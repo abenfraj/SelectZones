@@ -24,6 +24,7 @@ class Ui_SelectZones(object):
         self.statusbar = None  # type QtWidgets.QStatusBar
         self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
         self.image_is_displayed = False  # type bool
+        self.rectangles = []
 
     # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
@@ -73,7 +74,7 @@ class Ui_SelectZones(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)  # Create the vertical layout.
         self.verticalLayout.setObjectName("verticalLayout")  # Set the name of the vertical layout.
 
-        self.bitmap_label = BitmapLabel()  # Create the bitmap label.
+        self.bitmap_label = BitmapLabel(self.rectangles)  # Create the bitmap label.
         self.bitmap_label.setText("")  # Set the text of the bitmap label.
         self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)  # Set the alignment of the bitmap label.
         self.bitmap_label.setObjectName("bitmap_label")  # Set the name of the bitmap label.
