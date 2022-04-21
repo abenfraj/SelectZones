@@ -7,10 +7,13 @@ FREE_STATE = 1
 BUILDING_SQUARE = 2
 BEGIN_SIDE_EDIT = 3
 END_SIDE_EDIT = 4
+TOP_SIDE_EDIT = 5
+BOTTOM_SIDE_EDIT = 6
 
 CURSOR_ON_BEGIN_SIDE = 1
 CURSOR_ON_END_SIDE = 2
-
+CURSOR_ON_TOP_SIDE = 3
+CURSOR_ON_BOTTOM_SIDE = 4
 
 # This is a subclass of QLabel that allows the program to track the events happening on the label.
 class BitmapLabel(QLabel):
@@ -42,7 +45,7 @@ class BitmapLabel(QLabel):
             # for rectangle in self.rectangles:  # For each rectangle
             #     painter.drawRect(rectangle)  # Draw the rectangle
 
-            # if not self.beginning.isNull() and not self.end.isNull():  # If the begin and end points are not null
+            # if not self.beginning.isNull() and not self.end.isNull():  # If the beginning and end points are not null
             #     painter.drawRect(QRect(self.beginning, self.end).normalized())  # Draw the rectangle
             if not self.free_cursor_on_side:
                 return
@@ -58,6 +61,16 @@ class BitmapLabel(QLabel):
                 beginning.setX(self.end.x())
                 painter.drawLine(self.end, beginning)
 
+            elif self.free_cursor_on_side == CURSOR_ON_TOP_SIDE:
+                end = QPoint(self.end)
+                end.setY(self.beginning.y())
+                painter.drawLine(self.beginning, end)
+
+            elif self.free_cursor_on_side == CURSOR_ON_BOTTOM_SIDE:
+                beginning = QPoint(self.beginning)
+                beginning.setY(self.end.y())
+                painter.drawLine(self.end, beginning)
+
     def cursor_on_side(self, e_pos) -> int:
         if not self.beginning.isNull() and not self.end.isNull():
             y1, y2 = sorted([self.beginning.y(), self.end.y()])
@@ -65,11 +78,13 @@ class BitmapLabel(QLabel):
 
                 # 5 resolution, more easy to pick than 1px
                 if abs(self.beginning.x() - e_pos.x()) <= 5:
-                    print("beginning")
                     return CURSOR_ON_BEGIN_SIDE
                 elif abs(self.end.x() - e_pos.x()) <= 5:
-                    print("end")
                     return CURSOR_ON_END_SIDE
+                elif abs(self.beginning.y() - e_pos.y()) <= 5:
+                    return CURSOR_ON_TOP_SIDE
+                elif abs(self.end.y() - e_pos.y()) <= 5:
+                    return CURSOR_ON_BOTTOM_SIDE
 
         return 0
 
@@ -82,13 +97,16 @@ class BitmapLabel(QLabel):
                 self.state = BEGIN_SIDE_EDIT
             elif side == CURSOR_ON_END_SIDE:
                 self.state = END_SIDE_EDIT
+            elif side == CURSOR_ON_TOP_SIDE:
+                self.state = TOP_SIDE_EDIT
+            elif side == CURSOR_ON_BOTTOM_SIDE:
+                self.state = BOTTOM_SIDE_EDIT
             else:
                 self.state = BUILDING_SQUARE
 
                 self.beginning = event.pos()
                 self.end = event.pos()
                 self.update()  # Update the label
-
 
     # This method is called when the mouse is released.
     def mouseReleaseEvent(self, event):
@@ -105,8 +123,10 @@ class BitmapLabel(QLabel):
             super().mouseMoveEvent(event)  # Call the parent class's mouseMoveEvent method
             if self.state == FREE_STATE:
                 self.free_cursor_on_side = self.cursor_on_side(event.pos())
-                if self.free_cursor_on_side:
+                if self.free_cursor_on_side == CURSOR_ON_BEGIN_SIDE or self.free_cursor_on_side == CURSOR_ON_END_SIDE:
                     self.setCursor(Qt.SizeHorCursor)
+                elif self.free_cursor_on_side == CURSOR_ON_TOP_SIDE or self.free_cursor_on_side == CURSOR_ON_BOTTOM_SIDE:
+                    self.setCursor(Qt.SizeVerCursor)
                 else:
                     self.unsetCursor()
                 self.update()
@@ -121,6 +141,10 @@ class BitmapLabel(QLabel):
             self.beginning.setX(event.x())  # Set the beginning point's x to the current position's x
         elif self.state == END_SIDE_EDIT:  # If the state is END_SIDE_EDIT
             self.end.setX(event.x())  # Set the end point's x to the current position's x
+        elif self.state == TOP_SIDE_EDIT:  # If the state is TOP_SIDE_EDIT
+            self.beginning.setY(event.y())  # Set the beginning point's y to the current position's y
+        elif self.state == BOTTOM_SIDE_EDIT:  # If the state is BOTTOM_SIDE_EDIT
+            self.end.setY(event.y())  # Set the end point's y to the current position's y
 
     # This method sets the image that will be displayed on the label.
     def wheelEvent(self, event):
@@ -149,3 +173,8 @@ class BitmapLabel(QLabel):
         size = self.pixmap.size()  # Get the size of the pixmap
         scaled_pixmap = self.pixmap.scaled(self.scale * size)  # Scale the pixmap
         self.setPixmap(scaled_pixmap)  # Set the pixmap to the scaled pixmap
+
+    def resize_rectangles(self):
+        for rectangle in self.rectangles:
+            rectangle.setWidth(self.scale * rectangle.width())
+            rectangle.setHeight(self.scale * rectangle.height())

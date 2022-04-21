@@ -1,3 +1,5 @@
+"""
+
 import sys
 
 from PyQt5.QtCore import *
@@ -111,3 +113,4 @@ if __name__ == '__main__':
     window.show()
     app.aboutToQuit.connect(app.deleteLater)
     sys.exit(app.exec_())
+"""
