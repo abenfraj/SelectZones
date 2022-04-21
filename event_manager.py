@@ -38,6 +38,7 @@ class Event_Manager(QMainWindow):
                                                   )  # Get the file name from the file explorer
         if fileName:  # If the file name is not empty
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
+            self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
             self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
 
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
@@ -76,7 +77,7 @@ class Event_Manager(QMainWindow):
     # This function is used to update the mouse tracker label
     def on_positionChanged(self, pos):
         try:
-            real_width, real_height = self.ui.bitmap_label.bitmap_image.size  # Get the real width and height of the image
+            real_width, real_height = self.ui.original_image.size  # Get the real width and height of the image
             self.ui.mousetracker_label.setText("x: %d, y: %d" % (
                 real_width * pos.x() / self.ui.bitmap_label.size().width(),
                 real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label

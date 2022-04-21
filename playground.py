@@ -17,7 +17,7 @@ class MyWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(30, 30, 600, 400)
-        self.begin = QPoint()
+        self.beginning = QPoint()
         self.end = QPoint()
 
         self.state = FREE_STATE
@@ -25,39 +25,47 @@ class MyWidget(QWidget):
         self.free_cursor_on_side = 0
 
     def paintEvent(self, event):
-        qp = QPainter(self)
+        super().paintEvent(event)  # Call the parent class's paintEvent method
+        painter = QPainter(self)  # Create a QPainter object
         br = QBrush(QColor(100, 10, 10, 40))
-        qp.setBrush(br)
-        qp.drawRect(QRect(self.begin, self.end))
+        painter.setBrush(br)
+        painter.drawRect(QRect(self.beginning, self.end))
+        # for rectangle in self.rectangles:  # For each rectangle
+        #     painter.drawRect(rectangle)  # Draw the rectangle
 
+        # if not self.beginning.isNull() and not self.end.isNull():  # If the begin and end points are not null
+        #     painter.drawRect(QRect(self.beginning, self.end).normalized())  # Draw the rectangle
         if not self.free_cursor_on_side:
             return
 
-        qp.setPen(QPen(Qt.black, 5, Qt.DashLine))
+        painter.setPen(QPen(Qt.black, 3, Qt.DashLine))
         if self.free_cursor_on_side == CURSOR_ON_BEGIN_SIDE:
             end = QPoint(self.end)
-            end.setX(self.begin.x())
-            qp.drawLine(self.begin, end)
+            end.setX(self.beginning.x())
+            painter.drawLine(self.beginning, end)
 
         elif self.free_cursor_on_side == CURSOR_ON_END_SIDE:
-            begin = QPoint(self.begin)
-            begin.setX(self.end.x())
-            qp.drawLine(self.end, begin)
+            beginning = QPoint(self.beginning)
+            beginning.setX(self.end.x())
+            painter.drawLine(self.end, beginning)
 
     def cursor_on_side(self, e_pos) -> int:
-        if not self.begin.isNull() and not self.end.isNull():
-            y1, y2 = sorted([self.begin.y(), self.end.y()])
+        if not self.beginning.isNull() and not self.end.isNull():
+            y1, y2 = sorted([self.beginning.y(), self.end.y()])
             if y1 <= e_pos.y() <= y2:
 
                 # 5 resolution, more easy to pick than 1px
-                if abs(self.begin.x() - e_pos.x()) <= 5:
+                if abs(self.beginning.x() - e_pos.x()) <= 5:
+                    print("beginning")
                     return CURSOR_ON_BEGIN_SIDE
                 elif abs(self.end.x() - e_pos.x()) <= 5:
+                    print("end")
                     return CURSOR_ON_END_SIDE
 
         return 0
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
         side = self.cursor_on_side(event.pos())
         if side == CURSOR_ON_BEGIN_SIDE:
             self.state = BEGIN_SIDE_EDIT
@@ -79,6 +87,7 @@ class MyWidget(QWidget):
             self.end.setX(event.x())
 
     def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
         if self.state == FREE_STATE:
             self.free_cursor_on_side = self.cursor_on_side(event.pos())
             if self.free_cursor_on_side:
@@ -91,6 +100,7 @@ class MyWidget(QWidget):
             self.update()
 
     def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
         self.applye_event(event)
         self.state = FREE_STATE
 

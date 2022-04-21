@@ -25,6 +25,7 @@ class Ui_SelectZones(object):
         self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
         self.image_is_displayed = False  # type bool
         self.rectangles = []
+        self.original_image = None  # type QtGui.QImage
 
     # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
