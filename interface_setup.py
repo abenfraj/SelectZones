@@ -7,6 +7,8 @@ from mouse_tracker import MouseTracker
 
 
 # This class is used to create the interface for the application.
+
+
 class Ui_SelectZones(object):
     # Initialize each of the widgets in the interface.
     def __init__(self):
@@ -24,7 +26,7 @@ class Ui_SelectZones(object):
         self.statusbar = None  # type QtWidgets.QStatusBar
         self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
         self.image_is_displayed = False  # type bool
-        self.rectangles = []
+        self.rectangles = []  # type list of Rectangle
         self.original_image = None  # type QtGui.QImage
 
     # This function is used to translate the interface.

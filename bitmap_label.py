@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from PyQt5.QtCore import QRect, Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, QRect
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor
 from PyQt5.QtWidgets import QLabel
 
@@ -15,6 +15,7 @@ CURSOR_ON_END_SIDE = 2
 CURSOR_ON_TOP_SIDE = 3
 CURSOR_ON_BOTTOM_SIDE = 4
 
+
 # This is a subclass of QLabel that allows the program to track the events happening on the label.
 class BitmapLabel(QLabel):
     # This is the constructor for the class.
@@ -24,11 +25,12 @@ class BitmapLabel(QLabel):
         self.pixmap = None  # This is the pixmap that will be displayed on the label
         self.scale = 1.0  # This is the scale of the image
 
-        # self.rectangles = rectangles  # This is a list of rectangles that will be drawn on the image
+        self.rectangles = rectangles  # This is a list of rectangles that will be drawn on the image
         self.beginning = QtCore.QPoint()  # This is the point where the mouse press event occurred
         self.end = QtCore.QPoint()  # This is the point where the mouse release event occurred
 
         self.state = FREE_STATE
+
         self.setMouseTracking(True)
         self.free_cursor_on_side = 0
 
@@ -41,12 +43,10 @@ class BitmapLabel(QLabel):
             painter = QPainter(self)  # Create a QPainter object
             br = QBrush(QColor(100, 10, 10, 40))
             painter.setBrush(br)
+            for rectangle in self.rectangles:
+                painter.drawRect(rectangle)  # Draw the rectangle
             painter.drawRect(QRect(self.beginning, self.end))
-            # for rectangle in self.rectangles:  # For each rectangle
-            #     painter.drawRect(rectangle)  # Draw the rectangle
 
-            # if not self.beginning.isNull() and not self.end.isNull():  # If the beginning and end points are not null
-            #     painter.drawRect(QRect(self.beginning, self.end).normalized())  # Draw the rectangle
             if not self.free_cursor_on_side:
                 return
 
@@ -73,19 +73,21 @@ class BitmapLabel(QLabel):
 
     def cursor_on_side(self, e_pos) -> int:
         if not self.beginning.isNull() and not self.end.isNull():
+            x1, x2 = sorted([self.beginning.x(), self.end.x()])
             y1, y2 = sorted([self.beginning.y(), self.end.y()])
-            if y1 <= e_pos.y() <= y2:
 
-                # 5 resolution, more easy to pick than 1px
-                if abs(self.beginning.x() - e_pos.x()) <= 5:
-                    return CURSOR_ON_BEGIN_SIDE
-                elif abs(self.end.x() - e_pos.x()) <= 5:
-                    return CURSOR_ON_END_SIDE
-                elif abs(self.beginning.y() - e_pos.y()) <= 5:
+            if x1 <= e_pos.x() <= x2:
+
+                if abs(self.beginning.y() - e_pos.y()) <= 5:
                     return CURSOR_ON_TOP_SIDE
                 elif abs(self.end.y() - e_pos.y()) <= 5:
                     return CURSOR_ON_BOTTOM_SIDE
 
+            if y1 <= e_pos.y() <= y2:
+                if abs(self.beginning.x() - e_pos.x()) <= 5:
+                    return CURSOR_ON_BEGIN_SIDE
+                elif abs(self.end.x() - e_pos.x()) <= 5:
+                    return CURSOR_ON_END_SIDE
         return 0
 
     # This method is called when the mouse is pressed.
@@ -103,7 +105,9 @@ class BitmapLabel(QLabel):
                 self.state = BOTTOM_SIDE_EDIT
             else:
                 self.state = BUILDING_SQUARE
-
+                if not self.beginning.isNull() and not self.end.isNull():
+                    self.rectangles.append(QRect(self.beginning, self.end))
+                    print(self.rectangles)
                 self.beginning = event.pos()
                 self.end = event.pos()
                 self.update()  # Update the label
@@ -111,11 +115,9 @@ class BitmapLabel(QLabel):
     # This method is called when the mouse is released.
     def mouseReleaseEvent(self, event):
         if self.bitmap_image is not None:  # If the image is not None
-            super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
-            # r = QRect(self.beginning, self.end).normalized()  # Create a QRect object with the beginning and end points
-            # self.rectangles.append(r)  # Add the rectangle to the list of rectangles
             self.apply_event(event)
             self.state = FREE_STATE
+            super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
 
     # This method is called when the mouse is moved.
     def mouseMoveEvent(self, event):

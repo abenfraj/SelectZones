@@ -40,6 +40,7 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
             self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
+            print(self.ui.bitmap_data)
 
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
                 (4600, 1000),
