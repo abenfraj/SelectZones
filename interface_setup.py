@@ -12,6 +12,9 @@ from mouse_tracker import MouseTracker
 class Ui_SelectZones(object):
     # Initialize each of the widgets in the interface.
     def __init__(self):
+        self.contrast_slider = None
+        self.scrollArea_2 = None
+        self.horizontalSlider = None
         self.centralwidget = None  # type QtWidgets.QWidget
         self.quit_button = None  # type QtWidgets.QPushButton
         self.flip_image_button = None  # type QtWidgets.QPushButton
@@ -27,6 +30,7 @@ class Ui_SelectZones(object):
         self.mouse_tracker = None  # type MouseTracker (made in mouse_tracker.py)
         self.image_is_displayed = False  # type bool
         self.rectangles = []  # type list of Rectangle
+        self.sample_group_boxes = []  # type list of QGroupBox
         self.original_image = None  # type QtGui.QImage
 
     # This function is used to translate the interface.
@@ -37,9 +41,11 @@ class Ui_SelectZones(object):
         self.quit_button.setText(_translate("SelectZones", "Quit"))  # Set the text of the quit button.
         self.select_bitmap_button.setText(
             _translate("SelectZones", "Choose Bitmap"))  # Set the text of the select bitmap button.
-        self.flip_image_button.setText(_translate("SelectZones", "Flip Image"))  # Set the text of the flip image button.
+        self.flip_image_button.setText(
+            _translate("SelectZones", "Flip Image"))  # Set the text of the flip image button.
         self.save_bmp_data_button.setText(
             _translate("SelectZones", "Save Bitmap Data"))  # Set the text of the save bitmap data button.
+        self.contrast_slider.setText(_translate("SelectZones", "Contrast"))
 
     # This function is used to set up the interface.
     def setupUi(self, SelectZones):
@@ -77,7 +83,7 @@ class Ui_SelectZones(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)  # Create the vertical layout.
         self.verticalLayout.setObjectName("verticalLayout")  # Set the name of the vertical layout.
 
-        self.bitmap_label = BitmapLabel(self.rectangles)  # Create the bitmap label.
+        self.bitmap_label = BitmapLabel(self)  # Create the bitmap label.
         self.bitmap_label.setText("")  # Set the text of the bitmap label.
         self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)  # Set the alignment of the bitmap label.
         self.bitmap_label.setObjectName("bitmap_label")  # Set the name of the bitmap label.
@@ -86,6 +92,24 @@ class Ui_SelectZones(object):
 
         self.scrollArea.setWidget(
             self.scrollAreaWidgetContents)  # Set the scroll area to the scroll area widget contents.
+
+        self.contrast_slider = QtWidgets.QLabel(self.centralwidget)
+        self.contrast_slider.setGeometry(QtCore.QRect(750, 500, 55, 16))
+        self.contrast_slider.setObjectName("Contrast slider")
+        
+        self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 160, 22))
+        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+
+        self.scrollArea_2 = QtWidgets.QScrollArea(self.centralwidget)
+        self.scrollArea_2.setGeometry(QtCore.QRect(10, 480, 601, 361))
+        self.scrollArea_2.setWidgetResizable(True)
+        self.scrollArea_2.setObjectName("scrollArea_2")
+
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 599, 359))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
 
         self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)  # Create the save bitmap data button.
         self.save_bmp_data_button.setGeometry(

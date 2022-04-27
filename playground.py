@@ -1,113 +1,44 @@
+#!/usr/bin/python
+
 import sys
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QApplication, QLabel, QLineEdit,
+                             QVBoxLayout, QWidget)
 
 
-FREE_STATE = 1
-BUILDING_SQUARE = 2
-BEGIN_SIDE_EDIT = 3
-END_SIDE_EDIT = 4
+class Example(QWidget):
 
-
-CURSOR_ON_BEGIN_SIDE = 1
-CURSOR_ON_END_SIDE = 2
-
-
-class MyWidget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setGeometry(30, 30, 600, 400)
 
-        self.rectangles = []
-        self.begin = QPoint()
-        self.end = QPoint()
+        self.initUI()
 
-        self.state = FREE_STATE
+    def initUI(self):
+        hbox = QVBoxLayout(self)
 
-        self.setMouseTracking(True)
-        self.free_cursor_on_side = 0
+        self.lbl = QLabel(self)
+        qle = QLineEdit(self)
 
-    def paintEvent(self, event):
-        qp = QPainter(self)
-        br = QBrush(QColor(100, 10, 10, 40))
-        qp.setBrush(br)
-        for rectangle in self.rectangles:
-            qp.drawRect(rectangle)
-        qp.drawRect(QRect(self.begin, self.end))
+        qle.textChanged[str].connect(self.onChanged)
 
-        if not self.free_cursor_on_side:
-            return
+        hbox.addWidget(self.lbl)
+        hbox.addSpacing(20)
+        hbox.addWidget(qle)
 
-        qp.setPen(QPen(Qt.black, 5, Qt.DashLine))
-        if self.free_cursor_on_side == CURSOR_ON_BEGIN_SIDE:
-            end = QPoint(self.end)
-            end.setX(self.begin.x())
-            qp.drawLine(self.begin, end)
+        self.resize(250, 200)
+        self.setWindowTitle('QLineEdit')
+        self.show()
 
-        elif self.free_cursor_on_side == CURSOR_ON_END_SIDE:
-            begin = QPoint(self.begin)
-            begin.setX(self.end.x())
-            qp.drawLine(self.end, begin)
+    def onChanged(self, text):
+        self.lbl.setText(text)
+        self.lbl.adjustSize()
 
-    def cursor_on_side(self, e_pos) -> int:
-        if not self.begin.isNull() and not self.end.isNull():
-            y1, y2 = sorted([self.begin.y(), self.end.y()])
-            if y1 <= e_pos.y() <= y2:
 
-                # 5 resolution, more easy to pick than 1px
-                if abs(self.begin.x() - e_pos.x()) <= 5:
-                    return CURSOR_ON_BEGIN_SIDE
-                elif abs(self.end.x() - e_pos.x()) <= 5:
-                    return CURSOR_ON_END_SIDE
-
-        return 0
-
-    def mousePressEvent(self, event):
-        side = self.cursor_on_side(event.pos())
-        if side == CURSOR_ON_BEGIN_SIDE:
-            self.state = BEGIN_SIDE_EDIT
-        elif side == CURSOR_ON_END_SIDE:
-            self.state = END_SIDE_EDIT
-        else:
-            self.state = BUILDING_SQUARE
-            if not self.begin.isNull() and not self.end.isNull():
-                self.rectangles.append(QRect(self.begin, self.end))
-                print(self.rectangles)
-            self.begin = event.pos()
-            self.end = event.pos()
-            self.update()
-
-    def applye_event(self, event):
-
-        if self.state == BUILDING_SQUARE:
-            self.end = event.pos()
-        elif self.state == BEGIN_SIDE_EDIT:
-            self.begin.setX(event.x())
-        elif self.state == END_SIDE_EDIT:
-            self.end.setX(event.x())
-
-    def mouseMoveEvent(self, event):
-        if self.state == FREE_STATE:
-            self.free_cursor_on_side = self.cursor_on_side(event.pos())
-            if self.free_cursor_on_side:
-                self.setCursor(Qt.SizeHorCursor)
-            else:
-                self.unsetCursor()
-            self.update()
-        else:
-            self.applye_event(event)
-            self.update()
-
-    def mouseReleaseEvent(self, event):
-        self.applye_event(event)
-        self.state = FREE_STATE
+def main():
+    app = QApplication(sys.argv)
+    ex = Example()
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MyWidget()
-    window.show()
-    app.aboutToQuit.connect(app.deleteLater)
-    sys.exit(app.exec_())
+    main()

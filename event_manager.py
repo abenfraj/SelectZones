@@ -5,6 +5,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
 from numpy import asarray
 
+from sample_group_box import SampleGroupBox
+
 Image.MAX_IMAGE_PIXELS = None
 
 
@@ -40,10 +42,8 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
             self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
-            print(self.ui.bitmap_data)
-
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
-                (4600, 1000),
+                (1837, 367),
                 QtCore.Qt.KeepAspectRatio)  # Resize the image to fit the bitmap label
             resized_image.save("_resized.bmp")  # Save the resized image
             self.ui.bitmap_label.bitmap_image = resized_image  # Set the bitmap label to the resized image
