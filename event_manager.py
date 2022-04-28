@@ -5,8 +5,6 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
 from numpy import asarray
 
-from sample_group_box import SampleGroupBox
-
 Image.MAX_IMAGE_PIXELS = None
 
 

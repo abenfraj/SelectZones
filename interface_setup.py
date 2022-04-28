@@ -12,6 +12,11 @@ from mouse_tracker import MouseTracker
 class Ui_SelectZones(object):
     # Initialize each of the widgets in the interface.
     def __init__(self):
+        self.vert_lay = None
+        self.scrollAreaWidgetContents_2 = None
+        self.groupBox = None
+        self.verticalLayout_2 = None
+        self.verticalLayoutWidget = None
         self.contrast_slider = None
         self.scrollArea_2 = None
         self.horizontalSlider = None
@@ -96,21 +101,31 @@ class Ui_SelectZones(object):
         self.contrast_slider = QtWidgets.QLabel(self.centralwidget)
         self.contrast_slider.setGeometry(QtCore.QRect(750, 500, 55, 16))
         self.contrast_slider.setObjectName("Contrast slider")
-        
+
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 160, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
 
-        self.scrollArea_2 = QtWidgets.QScrollArea(self.centralwidget)
-        self.scrollArea_2.setGeometry(QtCore.QRect(10, 480, 601, 361))
+########################################################################################################################
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox.setGeometry(QtCore.QRect(10, 480, 670, 361))
+        self.groupBox.setObjectName("groupBox")
+
+        self.scrollArea_2 = QtWidgets.QScrollArea(self.groupBox)
+        self.scrollArea_2.setFixedWidth(670)
+        self.scrollArea_2.setMinimumHeight(361)
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
 
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 599, 359))
-        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
 
+        self.vert_lay = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.vert_lay.setObjectName("vert_lay")
+
+########################################################################################################################
         self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)  # Create the save bitmap data button.
         self.save_bmp_data_button.setGeometry(
             QtCore.QRect(780, 780, 331, 28))  # Set the geometry of the save bitmap data button.
