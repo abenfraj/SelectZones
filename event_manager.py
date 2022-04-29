@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageEnhance
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QPixmap
@@ -40,6 +40,7 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
             self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
+            print(self.ui.bitmap_data)
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
                 (1837, 367),
                 QtCore.Qt.KeepAspectRatio)  # Resize the image to fit the bitmap label
@@ -53,6 +54,9 @@ class Event_Manager(QMainWindow):
                 self.ui.flip_image_button.clicked.connect(
                     self.flip_image)  # Connect the flip image button to the flip_image function
                 self.ui.image_is_displayed = True  # Set the image is displayed attribute to True
+                self.ui.horizontalSlider.setEnabled(True)  # Enable the horizontal slider
+                self.ui.horizontalSlider.valueChanged.connect(
+                    self.setContrast)  # Connect the horizontal slider to the setContrast function
 
     # This function is used to save the bitmap data
     def saveBmpData(self):
@@ -92,3 +96,15 @@ class Event_Manager(QMainWindow):
         self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
         self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
         self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
+
+    def setContrast(self):
+        contrast_value = self.ui.horizontalSlider.value()  # Get the contrast value
+        contrast = ImageEnhance.Contrast(self.ui.bitmap_label.bitmap_image)  # Create an image enhancer object
+        modified_contrast_image = contrast.enhance((contrast_value - 50) / 25. + 0.5)
+        modified_contrast_image.resize(
+            (self.ui.pixmap.width(), self.ui.pixmap.height()),
+            QtCore.Qt.KeepAspectRatio).save("_contrasted.bmp")  # Save the enhanced image
+        self.ui.pixmap = QPixmap("_contrasted.bmp")  # Create a QPixmap from the resized image
+        self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
+        self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
+        self.ui.bitmap_label.update()  # Update the bitmap label

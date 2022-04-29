@@ -1,63 +1,82 @@
-from PyQt5 import QtCore, QtWidgets
+from tkinter import *
+from tkinter import filedialog
+from PIL import Image, ImageEnhance, ImageTk
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(415, 213)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
 
-        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(0, 0, 801, 601))
-        self.groupBox.setObjectName("groupBox")
+def update_image():
+    global img, adapted_img,contrast_val
+    contrast = ImageEnhance.Contrast(img)
+    imgMod = contrast.enhance((contrast_val-50)/25. +0.5)
 
-        self.scrollArea = QtWidgets.QScrollArea(self.groupBox)
-        self.scrollArea.move(10, 30)
-        self.scrollArea.setFixedWidth(380)
-        self.scrollArea.setMinimumHeight(160)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
+    adapted_img = ImageTk.PhotoImage(imgMod)
+    image_container.create_image(0, 0, image=adapted_img, anchor=NW)
 
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
-        random_label = QtWidgets.QLabel(self.scrollAreaWidgetContents)
-        random_label.setGeometry(QtCore.QRect(0, 0, 141, 16))
-        random_label.setText("Rectangle ")
-        MainWindow.setCentralWidget(self.centralwidget)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+def open_image():
+    global img
+    try:
+        img = Image.open(
+            filedialog.askopenfilename(title="Select file", filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*"))))
+        save_button.config(bg=default_color)
+        flip_horizontal_button.config(bg=default_color)
+        flip_vertical_button.config(bg=default_color)
+        contrast_slider.config(bg=default_color)
+        update_image()
+    except:
+        pass
 
-class CompetencyBox(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(CompetencyBox, self).__init__(parent)
-        self.compCodeLineEdit = QtWidgets.QLineEdit()
-        self.compDescrpTextEdit = QtWidgets.QTextEdit()
-        lay = QtWidgets.QVBoxLayout(self)
-        box = QtWidgets.QGroupBox()
-        lay.addWidget(box)
-        form_lay = QtWidgets.QFormLayout()
-        form_lay.addRow(QtWidgets.QLabel("Код: "), self.compCodeLineEdit)
-        form_lay.addRow(QtWidgets.QLabel("Описание: "), self.compDescrpTextEdit)
-        box.setLayout(form_lay)
-        box.setFixedSize(510, 240)
 
-class Test_Window(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None):
-        super(Test_Window, self).__init__(parent)
-        self.setupUi(self)
-        self.addBox(self.scrollAreaWidgetContents, CompetencyBox, 4)
+def flip_horizontal():
+    global img
+    if img:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        update_image()
 
-    def addBox(self, parent, element, number):
-        vert_lay = QtWidgets.QVBoxLayout(parent)
-        for i in range(number):
-            vert_lay.addWidget(element())
-        vert_lay.setSpacing(5)
 
-if __name__ == '__main__':
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    w = Test_Window()
-    w.resize(640, 480)
-    w.show()
-    sys.exit(app.exec_())
+def flip_vertical():
+    global img
+    if img:
+        img = img.transpose(Image.FLIP_TOP_BOTTOM)
+        update_image()
+
+
+def save():
+    global img
+    if img:
+        ext = StringVar()
+        name = filedialog.asksaveasfilename(initialfile="Untitled", title="Select file", typevariable=ext, filetypes=(
+            ('JPEG', ('*.jpg', '*.jpeg', '*.jpe')), ('PNG', '*.png'), ('GIF', '*.gif')))
+        if name:
+            img.save(name + "." + ext.get().lower())  # splice the string and the extension.
+
+
+def change_contrast(var):
+    global img, contrast_val
+    contrast_val =int(var)
+    update_image()
+
+
+root = Tk()
+root.title("Image Editor")
+root.geometry('600x500')
+default_color = root.cget('bg')
+
+img = None
+contrast_val = 50
+
+open_button = Button(text='Open Image', font=('Arial', 20), command=open_image)
+flip_horizontal_button = Button(text='Flip Horizontal', font=('Arial', 10), command=flip_horizontal, bg="gray",
+                                width=15)
+flip_vertical_button = Button(text='Flip Vertical', font=('Arial', 10), command=flip_vertical, bg="gray", width=15)
+contrast_slider = Scale(from_=0, to=100, orient=HORIZONTAL, bg="gray", command=change_contrast)
+save_button = Button(text='Save', font=('Arial', 20), command=save, bg="gray")
+image_container = Canvas(root, borderwidth=5, relief="groove", width=300, height=300)
+
+image_container.pack(fill="both", expand="yes", anchor='nw', side=BOTTOM)
+open_button.pack(anchor='nw', side=LEFT)
+save_button.pack(anchor='nw', side=LEFT)
+contrast_slider.pack(anchor='w', side=LEFT)
+flip_horizontal_button.pack(anchor='w')
+flip_vertical_button.pack(anchor='w')
+
+root.mainloop()

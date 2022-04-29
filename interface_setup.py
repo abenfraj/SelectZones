@@ -106,6 +106,11 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 160, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.setMinimum(50)
+        self.horizontalSlider.setMaximum(200)
+        self.horizontalSlider.setValue(50)
+        self.horizontalSlider.setTickInterval(1)
+        self.horizontalSlider.setEnabled(False)
 
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 480, 670, 361))
