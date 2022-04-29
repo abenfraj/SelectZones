@@ -107,7 +107,6 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
 
-########################################################################################################################
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 480, 670, 361))
         self.groupBox.setObjectName("groupBox")
@@ -125,7 +124,6 @@ class Ui_SelectZones(object):
         self.vert_lay = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.vert_lay.setObjectName("vert_lay")
 
-########################################################################################################################
         self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)  # Create the save bitmap data button.
         self.save_bmp_data_button.setGeometry(
             QtCore.QRect(780, 780, 331, 28))  # Set the geometry of the save bitmap data button.

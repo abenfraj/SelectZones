@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QGridLayout
 
 
@@ -102,43 +103,61 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.ui.vert_lay.addWidget(self)
 
     def setX0(self):
-        real_width, real_height = self.ui.original_image.size
         x0 = self.rectangle.x()
-        self.lineEditX0.setText("%d" % (real_width * x0 / self.ui.bitmap_label.size().width()))
+        self.lineEditX0.setText("%d" % (self.ui.real_width * x0 / self.ui.bitmap_label.size().width()))
 
     def setY0(self):
-        real_width, real_height = self.ui.original_image.size
         y0 = self.rectangle.y()
-        self.lineEditY0.setText("%d" % (real_height * y0 / self.ui.bitmap_label.size().height()))
+        self.lineEditY0.setText("%d" % (self.ui.real_height * y0 / self.ui.bitmap_label.size().height()))
 
     def setXF(self):
-        real_width, real_height = self.ui.original_image.size
         xf = self.rectangle.x() + self.rectangle.width()
-        self.lineEditXF.setText("%d" % (real_width * xf / self.ui.bitmap_label.size().width()))
+        self.lineEditXF.setText("%d" % (self.ui.real_width * xf / self.ui.bitmap_label.size().width()))
 
     def setYF(self):
-        real_width, real_height = self.ui.original_image.size
         yf = self.rectangle.y() + self.rectangle.height()
-        self.lineEditYF.setText("%d" % (real_height * yf / self.ui.bitmap_label.size().height()))
+        self.lineEditYF.setText("%d" % (self.ui.real_height * yf / self.ui.bitmap_label.size().height()))
 
     def onX0Changed(self, text):
-        real_width, real_height = self.ui.original_image.size
-        self.rectangle.setX(int(self.ui.bitmap_label.size().width() * int(text) / real_width))
+        try:
+            self.rectangle.setX(int(self.ui.bitmap_label.size().width() * int(text) / self.ui.real_width))
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
+        except ValueError:
+            pass
+
+        self.ui.bitmap_label.update()
 
     def onY0Changed(self, text):
-        real_width, real_height = self.ui.original_image.size
-        self.rectangle.setY(int(self.ui.bitmap_label.size().height() * int(text) / real_height))
+        try:
+            self.rectangle.setY(int(self.ui.bitmap_label.size().height() * int(text) / self.ui.real_height))
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
+            self.ui.bitmap_label.update()
+        except ValueError:
+            pass
 
-    # TODO: BUG dans le calcul rectangle.setWidth
     def onXFChanged(self, text):
-        real_width, real_height = self.ui.original_image.size
-        self.rectangle.setWidth(int(self.ui.bitmap_label.size().width() * int(text) / real_width))
+        try:
+            self.rectangle.setWidth(
+                int(self.ui.bitmap_label.size().width() * int(text) / self.ui.real_width) - self.rectangle.x())
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setEnd(
+                    QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
+            self.ui.bitmap_label.update()
+        except ValueError:
+            pass
 
-    # TODO: BUG dans le calcul rectangle.setHeight
     def onYFChanged(self, text):
-        real_width, real_height = self.ui.original_image.size
-        self.rectangle.setHeight(int(self.ui.bitmap_label.size().height() * int(text) / real_height))
-        print(str(int(self.ui.bitmap_label.size().height() * int(text) / real_height)))
+        try:
+            self.rectangle.setHeight(
+                int(self.ui.bitmap_label.size().height() * int(text) / self.ui.real_height) - self.rectangle.y())
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setEnd(
+                    QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
+            self.ui.bitmap_label.update()
+        except ValueError:
+            pass
 
     def updateRectangle(self, rectangle):
         self.rectangle = rectangle

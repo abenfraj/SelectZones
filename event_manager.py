@@ -76,10 +76,10 @@ class Event_Manager(QMainWindow):
     # This function is used to update the mouse tracker label
     def on_positionChanged(self, pos):
         try:
-            real_width, real_height = self.ui.original_image.size  # Get the real width and height of the image
+            self.ui.real_width, self.ui.real_height = self.ui.original_image.size  # Get the real width and height of the image
             self.ui.mousetracker_label.setText("x: %d, y: %d" % (
-                real_width * pos.x() / self.ui.bitmap_label.size().width(),
-                real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label
+                self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width(),
+                self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label
         except AttributeError:  # If the bitmap image is not set
             pass
 

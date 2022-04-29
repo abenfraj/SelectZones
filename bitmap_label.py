@@ -238,3 +238,10 @@ class BitmapLabel(QLabel):
         size = self.pixmap.size()  # Get the size of the pixmap
         scaled_pixmap = self.pixmap.scaled(self.scale * size)  # Scale the pixmap
         self.setPixmap(scaled_pixmap)  # Set the pixmap to the scaled pixmap
+
+    def setBeginning(self, beginning):
+        self.beginning = beginning
+
+    def setEnd(self, end):
+        self.end = end
+
