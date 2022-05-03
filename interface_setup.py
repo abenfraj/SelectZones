@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtWidgets import QScrollArea, QSlider
 
 from bitmap_label import BitmapLabel
 from mouse_tracker import MouseTracker
@@ -23,6 +23,7 @@ class Ui_SelectZones(object):
         self.centralwidget = None  # type QtWidgets.QWidget
         self.quit_button = None  # type QtWidgets.QPushButton
         self.flip_image_button = None  # type QtWidgets.QPushButton
+        self.flipped = False  # type bool
         self.select_bitmap_button = None  # type QtWidgets.QPushButton
         self.scrollArea = None  # type QtWidgets.QScrollArea
         self.scrollAreaWidgetContents = None  # type QtWidgets.QWidget
@@ -110,6 +111,9 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setMaximum(200)
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setTickInterval(1)
+        self.horizontalSlider.setSingleStep(1)  # arrow-key step-size
+        self.horizontalSlider.setPageStep(1)  # mouse-wheel/page-key step-size
+        self.horizontalSlider.setTickPosition(QSlider.TicksBelow)
         self.horizontalSlider.setEnabled(False)
 
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)

@@ -1,3 +1,7 @@
+import os
+import pathlib
+import shutil
+
 from PIL import Image, ImageEnhance
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
@@ -37,10 +41,12 @@ class Event_Manager(QMainWindow):
                                                   "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
                                                   )  # Get the file name from the file explorer
         if fileName:  # If the file name is not empty
+            self.ui.file_name = os.path.basename(fileName).split('.', 1)[
+                0]  # Set the file name attribute to the file name without the extension
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
-            self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
-            print(self.ui.bitmap_data)
+            self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image).astype("uint16")  # Convert the image to a numpy array
+            print(self.ui.bitmap_data, self.ui.bitmap_data.shape, self.ui.bitmap_data.dtype)  # Print the bitmap data
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
                 (1837, 367),
                 QtCore.Qt.KeepAspectRatio)  # Resize the image to fit the bitmap label
@@ -60,21 +66,42 @@ class Event_Manager(QMainWindow):
 
     # This function is used to save the bitmap data
     def saveBmpData(self):
-        fileName, _ = QFileDialog.getSaveFileName(self,
-                                                  "Save File",
-                                                  "D:\\Workspace\\LERMA\\SelectZones",
-                                                  "TXT files (*.txt)",
-                                                  )  # Get the file name from the file explorer
-        if fileName:  # If the file name is not empty
-            print(self.ui.bitmap_data)
-            print(self.ui.bitmap_data.size)
-            str_iteration = ''
-            with open(fileName, 'w') as file:
-                for i in range(50):
-                    for j in range(50):
-                        str_iteration = str_iteration + str(self.ui.bitmap_data[i][j]) + '\n'
-                    file.write(str_iteration)
-            file.close()
+        directoryName = QFileDialog.getExistingDirectory(self,
+                                                         'Select a directory')  # Get the directory name from the file explorer
+        if directoryName:  # If the file name is not empty
+            path = directoryName + "/" + self.ui.file_name
+            pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+            shutil.rmtree(path)
+            for rectangle in self.ui.rectangles:  # For each rectangle
+                x0 = int(self.ui.real_width * rectangle.x() / self.ui.bitmap_label.size().width())
+                xf = int(
+                    self.ui.real_width * (rectangle.x() + rectangle.width()) / self.ui.bitmap_label.size().width())
+                y0 = int(self.ui.real_height * rectangle.y() / self.ui.bitmap_label.size().height())
+                yf = int(
+                    self.ui.real_height * (rectangle.y() + rectangle.height()) / self.ui.bitmap_label.size().height())
+                print("y0: ", y0, "yf: ", yf, "x0: ", x0, "xf: ", xf)
+                str_iteration = ''
+                path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
+                    self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
+                pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+                str_iteration += 'HEADER\n\n'
+                str_iteration += 'FLIPPED = ' + str(self.ui.flipped) + '\n\n'
+                str_iteration += 'Pixel X \tAverage Y Value\n\n'
+                with open(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".txt",
+                          'w') as file:
+                    for x in range(x0, xf):
+                        average_value = 0
+                        for y in range(y0, yf):
+                            np_sum = (int(self.ui.bitmap_data[y][x][0]) + int(self.ui.bitmap_data[y][x][1]) + int(self.ui.bitmap_data[y][x][2])) / 3
+                            average_value += np_sum
+                        average_value /= (yf - y0)
+                        str_iteration += str(x) + "\t\t" + str(average_value) + '\n'
+                        file.write(str_iteration)
+                        file.flush()
+                        str_iteration = ''
+                file.close()
+                cropped_image = self.ui.original_image.crop((x0, y0, xf, yf))
+                cropped_image.save(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".png")
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     # This function is used to update the mouse tracker label
@@ -96,6 +123,7 @@ class Event_Manager(QMainWindow):
         self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
         self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
         self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
+        self.ui.flipped = not self.ui.flipped  # Update the flipped boolean
 
     def setContrast(self):
         contrast_value = self.ui.horizontalSlider.value()  # Get the contrast value

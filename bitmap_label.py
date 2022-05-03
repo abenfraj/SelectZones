@@ -211,25 +211,19 @@ class BitmapLabel(QLabel):
             self.scale *= 2  # Increase the scale by 2
             self.resize_image()  # Resize the image
             for rectangle in self.rectangles:
-                print(self.scale, " * ", rectangle.width(), " = ", int(rectangle.width() * self.scale))
                 qp = QPoint(int(rectangle.x() * self.scale), int(rectangle.y() * self.scale))
                 qs = QSize(int(rectangle.width() * self.scale), int(rectangle.height() * self.scale))
-                print("before:", rectangle)
                 rectangle.moveTo(qp)
                 rectangle.setSize(qs)
-                print("after:", rectangle)
 
     # This method is called when the user zooms out with his mouse wheel.
     def on_zoom_out(self):
         if self.scale > 1:
             for rectangle in self.rectangles:
-                print(self.scale, " / ", rectangle.width(), " = ", int(rectangle.width() / self.scale))
                 qp = QPoint(int(rectangle.x() / self.scale), int(rectangle.y() / self.scale))
                 qs = QSize(int(rectangle.width() / self.scale), int(rectangle.height() / self.scale))
-                print("before:", rectangle)
                 rectangle.moveTo(qp)
                 rectangle.setSize(qs)
-                print("after:", rectangle)
             self.scale /= 2  # Decrease the scale by 2
             self.resize_image()  # Resize the image
 
