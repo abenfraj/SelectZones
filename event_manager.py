@@ -2,6 +2,7 @@ import os
 import pathlib
 import shutil
 
+import numpy as np
 from PIL import Image, ImageEnhance
 from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
@@ -31,8 +32,10 @@ class Event_Manager(QMainWindow):
         self.ui.mouse_tracker.positionChanged.connect(
             self.on_positionChanged)  # Connect the mouse tracker to the on_positionChanged function
 
-    # This function is used to open the file dialog
     def openFileDialog(self):
+        """
+            This function is used to open the file dialog
+        """
         if self.ui.bitmap_label.bitmap_image is not None:  # If the bitmap image is not None
             self.ui.bitmap_label.bitmap_image.close()  # Close the bitmap image
         fileName, _ = QFileDialog.getOpenFileName(self,
@@ -45,7 +48,7 @@ class Event_Manager(QMainWindow):
                 0]  # Set the file name attribute to the file name without the extension
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
-            self.ui.bitmap_data = asarray(self.ui.bitmap_label.bitmap_image).astype("uint16")  # Convert the image to a numpy array
+            self.ui.bitmap_data = np.array(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
             print(self.ui.bitmap_data, self.ui.bitmap_data.shape, self.ui.bitmap_data.dtype)  # Print the bitmap data
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
                 (1837, 367),
@@ -92,7 +95,8 @@ class Event_Manager(QMainWindow):
                     for x in range(x0, xf):
                         average_value = 0
                         for y in range(y0, yf):
-                            np_sum = (int(self.ui.bitmap_data[y][x][0]) + int(self.ui.bitmap_data[y][x][1]) + int(self.ui.bitmap_data[y][x][2])) / 3
+                            np_sum = (255 - int(self.ui.bitmap_data[y][x][0])) ** 2
+                            print("np_sum: ", np_sum)
                             average_value += np_sum
                         average_value /= (yf - y0)
                         str_iteration += str(x) + "\t\t" + str(average_value) + '\n'
@@ -101,7 +105,8 @@ class Event_Manager(QMainWindow):
                         str_iteration = ''
                 file.close()
                 cropped_image = self.ui.original_image.crop((x0, y0, xf, yf))
-                cropped_image.save(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".png")
+                cropped_image.save(
+                    path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".png")
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     # This function is used to update the mouse tracker label
@@ -129,6 +134,7 @@ class Event_Manager(QMainWindow):
         contrast_value = self.ui.horizontalSlider.value()  # Get the contrast value
         contrast = ImageEnhance.Contrast(self.ui.bitmap_label.bitmap_image)  # Create an image enhancer object
         modified_contrast_image = contrast.enhance((contrast_value - 50) / 25. + 0.5)
+        print((contrast_value - 50) / 25. + 0.5)
         modified_contrast_image.resize(
             (self.ui.pixmap.width(), self.ui.pixmap.height()),
             QtCore.Qt.KeepAspectRatio).save("_contrasted.bmp")  # Save the enhanced image
