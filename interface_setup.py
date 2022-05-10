@@ -50,7 +50,7 @@ class Ui_SelectZones(object):
         self.flip_image_button.setText(
             _translate("SelectZones", "Flip Image"))  # Set the text of the flip image button.
         self.save_bmp_data_button.setText(
-            _translate("SelectZones", "Save Bitmap Data"))  # Set the text of the save bitmap data button.
+            _translate("SelectZones", "Save selected zones"))  # Set the text of the save bitmap data button.
         self.contrast_slider.setText(_translate("SelectZones", "Contrast"))
 
     # This function is used to set up the interface.
@@ -104,15 +104,15 @@ class Ui_SelectZones(object):
         self.contrast_slider.setObjectName("Contrast slider")
 
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
-        self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 160, 22))
+        self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 250, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
         self.horizontalSlider.setMinimum(50)
-        self.horizontalSlider.setMaximum(200)
+        self.horizontalSlider.setMaximum(500)
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setTickInterval(1)
-        self.horizontalSlider.setSingleStep(1)  # arrow-key step-size
-        self.horizontalSlider.setPageStep(1)  # mouse-wheel/page-key step-size
+        self.horizontalSlider.setSingleStep(10)  # arrow-key step-size
+        self.horizontalSlider.setPageStep(10)  # mouse-wheel/page-key step-size
         self.horizontalSlider.setTickPosition(QSlider.TicksBelow)
         self.horizontalSlider.setEnabled(False)
 

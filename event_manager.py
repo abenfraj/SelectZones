@@ -1,6 +1,7 @@
 import os
 import pathlib
 import shutil
+from os.path import exists
 
 import numpy as np
 from PIL import Image, ImageEnhance
@@ -8,7 +9,6 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
-from numpy import asarray
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -26,7 +26,7 @@ class Event_Manager(QMainWindow):
         self.ui.select_bitmap_button.clicked.connect(
             self.openFileDialog)  # Connect the select bitmap button to the openFileNameDialog function
         self.ui.quit_button.clicked.connect(
-            QCoreApplication.instance().quit)  # Connect the quit button to the close function from QMainWindow
+            self.quitApp)  # Connect the quit button to the close function from QMainWindow
         self.ui.save_bmp_data_button.clicked.connect(
             self.saveBmpData)  # Connect the save bitmap data button to the saveBmpData function
         self.ui.mouse_tracker.positionChanged.connect(
@@ -40,7 +40,7 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image.close()  # Close the bitmap image
         fileName, _ = QFileDialog.getOpenFileName(self,
                                                   "Open File",
-                                                  "D:\\Workspace\\LERMA\\SelectZones",
+                                                  "",
                                                   "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
                                                   )  # Get the file name from the file explorer
         if fileName:  # If the file name is not empty
@@ -49,7 +49,6 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)  # Open the image
             self.ui.original_image = self.ui.bitmap_label.bitmap_image  # Set the original image to the bitmap image
             self.ui.bitmap_data = np.array(self.ui.bitmap_label.bitmap_image)  # Convert the image to a numpy array
-            print(self.ui.bitmap_data, self.ui.bitmap_data.shape, self.ui.bitmap_data.dtype)  # Print the bitmap data
             resized_image = self.ui.bitmap_label.bitmap_image.resize(
                 (1837, 367),
                 QtCore.Qt.KeepAspectRatio)  # Resize the image to fit the bitmap label
@@ -58,6 +57,19 @@ class Event_Manager(QMainWindow):
             self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
             self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
             self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
+
+            file_exists = exists("_previous_rectangles_data.txt")  # Check if the file exists
+            if file_exists:  # If the file exists
+                with open("_previous_rectangles_data.txt", "r") as f:  # Open the file
+                    self.ui.previous_rectangles_data = f.readlines()  # Read the file
+                    for rectangle_data in self.ui.previous_rectangles_data:  # For each rectangle data
+                        rectangle_data = rectangle_data[rectangle_data.find("(") + 1:rectangle_data.find(")")].split(
+                            ", ")  # Split the data
+                        self.ui.rectangles.append(QtCore.QRect(int(rectangle_data[0]), int(rectangle_data[1]),
+                                                               int(rectangle_data[2]) - int(rectangle_data[0]),
+                                                               int(rectangle_data[3]) - int(
+                                                                   rectangle_data[1])))  # Create a rectangle
+
             if self.ui.image_is_displayed is False:  # If the image is not displayed
                 self.ui.flip_image_button.setEnabled(True)  # Enable the flip image button
                 self.ui.flip_image_button.clicked.connect(
@@ -82,7 +94,6 @@ class Event_Manager(QMainWindow):
                 y0 = int(self.ui.real_height * rectangle.y() / self.ui.bitmap_label.size().height())
                 yf = int(
                     self.ui.real_height * (rectangle.y() + rectangle.height()) / self.ui.bitmap_label.size().height())
-                print("y0: ", y0, "yf: ", yf, "x0: ", x0, "xf: ", xf)
                 str_iteration = ''
                 path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
                     self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
@@ -95,11 +106,10 @@ class Event_Manager(QMainWindow):
                     for x in range(x0, xf):
                         average_value = 0
                         for y in range(y0, yf):
-                            np_sum = (255 - int(self.ui.bitmap_data[y][x][0])) ** 2
-                            print("np_sum: ", np_sum)
+                            np_sum = (256 ** 2) - (int(self.ui.bitmap_data[y][x][0]) ** 2)
                             average_value += np_sum
-                        average_value /= (yf - y0)
-                        str_iteration += str(x) + "\t\t" + str(average_value) + '\n'
+                        average_value /= (yf - y0 + 1)
+                        str_iteration += str("{:.3f}".format(x / 100)) + "\t\t" + str(int(average_value)) + '\n'
                         file.write(str_iteration)
                         file.flush()
                         str_iteration = ''
@@ -113,9 +123,10 @@ class Event_Manager(QMainWindow):
     def on_positionChanged(self, pos):
         try:
             self.ui.real_width, self.ui.real_height = self.ui.original_image.size  # Get the real width and height of the image
-            self.ui.mousetracker_label.setText("x: %d, y: %d" % (
-                self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width(),
-                self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()))  # Update the mouse tracker label
+            self.ui.mousetracker_label.setText("x: %.3f, y: %.3f" % (
+                (self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width()) * 0.21,
+                (
+                        self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()) * 0.21))  # Update the mouse tracker label
         except AttributeError:  # If the bitmap image is not set
             pass
 
@@ -134,7 +145,6 @@ class Event_Manager(QMainWindow):
         contrast_value = self.ui.horizontalSlider.value()  # Get the contrast value
         contrast = ImageEnhance.Contrast(self.ui.bitmap_label.bitmap_image)  # Create an image enhancer object
         modified_contrast_image = contrast.enhance((contrast_value - 50) / 25. + 0.5)
-        print((contrast_value - 50) / 25. + 0.5)
         modified_contrast_image.resize(
             (self.ui.pixmap.width(), self.ui.pixmap.height()),
             QtCore.Qt.KeepAspectRatio).save("_contrasted.bmp")  # Save the enhanced image
@@ -142,3 +152,13 @@ class Event_Manager(QMainWindow):
         self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
         self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
         self.ui.bitmap_label.update()  # Update the bitmap label
+
+    def quitApp(self):
+        with open("_previous_rectangles_data.txt", 'w') as file:
+            for rectangle in self.ui.rectangles:
+                print(rectangle)
+                str_iteration = str(rectangle.getCoords()) + '\n'
+                file.write(str_iteration)
+                file.flush()
+        file.close()
+        QCoreApplication.exit(0)

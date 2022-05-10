@@ -1,4 +1,4 @@
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtCore
 
 
 # This class is used to track the mouse position and send it to the main window

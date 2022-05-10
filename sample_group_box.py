@@ -1,5 +1,6 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QPoint
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QGridLayout
 
 
@@ -8,7 +9,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         super(SampleGroupBox, self).__init__()
 
         self.grid = None
-        self.radioButton = None
+        self.sample_name = None
         self.groupBox = None
 
         self.labelX0 = None
@@ -20,6 +21,8 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.lineEditY0 = None
         self.lineEditXF = None
         self.lineEditYF = None
+
+        self.removeButton = None
 
         self.ui = ui
         self.sample_number = sample_number
@@ -42,13 +45,18 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.lineEditXF = QtWidgets.QLineEdit(self.groupBox)
         self.lineEditYF = QtWidgets.QLineEdit(self.groupBox)
 
+        self.removeButton = QtWidgets.QPushButton(self.groupBox)
+        self.removeButton.setIcon(QIcon("Red-Close-Button-Transparent.png"))
+        self.removeButton.setIconSize(QtCore.QSize(20, 20))
+        self.removeButton.clicked.connect(self.remove_sample)
+
         lay = QtWidgets.QVBoxLayout(self)
         box = QtWidgets.QGroupBox()
         lay.addWidget(box)
 
-        self.radioButton = QtWidgets.QRadioButton()
-        self.radioButton.setGeometry(QtCore.QRect(10, 20, 95, 21))
-        self.radioButton.setObjectName("radioButton" + str(self.sample_number))
+        self.sample_name = QtWidgets.QLabel()
+        self.sample_name.setGeometry(QtCore.QRect(10, 20, 95, 21))
+        self.sample_name.setObjectName("sample_name" + str(self.sample_number))
 
         self.labelX0.setGeometry(QtCore.QRect(130, 20, 21, 21))
         self.labelX0.setObjectName("labelX0" + str(self.sample_number))
@@ -62,32 +70,32 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.lineEditX0.setGeometry(QtCore.QRect(150, 20, 61, 22))
         self.lineEditX0.setObjectName("lineEditX0" + str(self.sample_number))
-        self.lineEditX0.setInputMask("00000")
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditX0.textEdited[str].connect(self.onX0Changed)
 
         self.lineEditY0.setGeometry(QtCore.QRect(250, 20, 61, 22))
         self.lineEditY0.setObjectName("lineEditY0" + str(self.sample_number))
-        self.lineEditY0.setInputMask("00000")
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditY0.textEdited[str].connect(self.onY0Changed)
 
         self.lineEditXF.setGeometry(QtCore.QRect(390, 20, 61, 22))
         self.lineEditXF.setObjectName("lineEditXF" + str(self.sample_number))
-        self.lineEditXF.setInputMask("00000")
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditXF.textEdited[str].connect(self.onXFChanged)
 
         self.lineEditYF.setGeometry(QtCore.QRect(480, 20, 61, 22))
         self.lineEditYF.setObjectName("lineEditYF" + str(self.sample_number))
-        self.lineEditYF.setInputMask("00000")
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditYF.textEdited[str].connect(self.onYFChanged)
 
-        self.radioButton.setText("Sample " + str(self.sample_number + 1))
+        self.sample_name.setText("Sample " + str(self.sample_number + 1) + ":  ")
         self.labelX0.setText("x0")
         self.labelY0.setText("y0")
         self.labelXF.setText("xf")
         self.labelYF.setText("yf")
 
         self.grid = QGridLayout()
-        self.grid.addWidget(self.radioButton, 0, 0)
+        self.grid.addWidget(self.sample_name, 0, 0)
         self.grid.addWidget(self.labelX0, 0, 1)
         self.grid.addWidget(self.lineEditX0, 0, 2)
         self.grid.addWidget(self.labelY0, 0, 3)
@@ -96,6 +104,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.grid.addWidget(self.lineEditXF, 0, 6)
         self.grid.addWidget(self.labelYF, 0, 7)
         self.grid.addWidget(self.lineEditYF, 0, 8)
+        self.grid.addWidget(self.removeButton, 0, 9)
 
         box.setLayout(self.grid)
         box.setFixedSize(609, 59)
@@ -104,23 +113,23 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def setX0(self):
         x0 = self.rectangle.x()
-        self.lineEditX0.setText("%d" % (self.ui.real_width * x0 / self.ui.bitmap_label.size().width()))
+        self.lineEditX0.setText("%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) * 0.21))
 
     def setY0(self):
         y0 = self.rectangle.y()
-        self.lineEditY0.setText("%d" % (self.ui.real_height * y0 / self.ui.bitmap_label.size().height()))
+        self.lineEditY0.setText("%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) * 0.21))
 
     def setXF(self):
         xf = self.rectangle.x() + self.rectangle.width()
-        self.lineEditXF.setText("%d" % (self.ui.real_width * xf / self.ui.bitmap_label.size().width()))
+        self.lineEditXF.setText("%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) * 0.21))
 
     def setYF(self):
         yf = self.rectangle.y() + self.rectangle.height()
-        self.lineEditYF.setText("%d" % (self.ui.real_height * yf / self.ui.bitmap_label.size().height()))
+        self.lineEditYF.setText("%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) * 0.21))
 
     def onX0Changed(self, text):
         try:
-            self.rectangle.setX(int(self.ui.bitmap_label.size().width() * int(text) / self.ui.real_width))
+            self.rectangle.setX(int(self.ui.bitmap_label.size().width() * (int(text) / 0.21) / self.ui.real_width))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
         except ValueError:
@@ -130,7 +139,7 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def onY0Changed(self, text):
         try:
-            self.rectangle.setY(int(self.ui.bitmap_label.size().height() * int(text) / self.ui.real_height))
+            self.rectangle.setY(int(self.ui.bitmap_label.size().height() * (int(text) / 0.21) / self.ui.real_height))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
             self.ui.bitmap_label.update()
@@ -140,7 +149,7 @@ class SampleGroupBox(QtWidgets.QWidget):
     def onXFChanged(self, text):
         try:
             self.rectangle.setWidth(
-                int(self.ui.bitmap_label.size().width() * int(text) / self.ui.real_width) - self.rectangle.x())
+                int(self.ui.bitmap_label.size().width() * (int(text) / 0.21) / self.ui.real_width) - self.rectangle.x())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -151,7 +160,8 @@ class SampleGroupBox(QtWidgets.QWidget):
     def onYFChanged(self, text):
         try:
             self.rectangle.setHeight(
-                int(self.ui.bitmap_label.size().height() * int(text) / self.ui.real_height) - self.rectangle.y())
+                int(self.ui.bitmap_label.size().height() * (
+                        int(text) / 0.21) / self.ui.real_height) - self.rectangle.y())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -161,3 +171,16 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def updateRectangle(self, rectangle):
         self.rectangle = rectangle
+
+    def remove_sample(self):
+        self.ui.vert_lay.removeWidget(self)
+        self.deleteLater()
+        self.ui.rectangles.remove(self.rectangle)
+        self.ui.bitmap_label.update()
+        new_beginning = QPoint()
+        new_end = QPoint()
+        if len(self.ui.rectangles) != 0:
+            new_beginning = QPoint(self.ui.rectangles[-1].getCoords()[0], self.ui.rectangles[-1].getCoords()[1])
+            new_end = QPoint(self.ui.rectangles[-1].getCoords()[2], self.ui.rectangles[-1].getCoords()[3])
+        self.ui.bitmap_label.setBeginning(new_beginning)
+        self.ui.bitmap_label.setEnd(new_end)
