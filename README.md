@@ -14,6 +14,7 @@ The point of this program is to display an image that is imported locally from t
 
 The folder is composed of another/other folder(s) that contain(s) the cropped image selected by the rectangles with the text file containing the data of each column of pixel inside that rectangle.
 
+### Additional info
 __Author__ : Ayoub BEN FRAJ
 
 __Last Update__ : 2022-05-31 <i>(YYYY-MM-DD)</i>
