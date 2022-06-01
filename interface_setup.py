@@ -20,6 +20,7 @@ class Ui_SelectZones(object):
         self.contrast_slider = None
         self.scrollArea_2 = None
         self.horizontalSlider = None
+        self.contrastValueLabel = None
         self.centralwidget = None  # type QtWidgets.QWidget
         self.quit_button = None  # type QtWidgets.QPushButton
         self.flip_image_button = None  # type QtWidgets.QPushButton
@@ -57,6 +58,7 @@ class Ui_SelectZones(object):
     def setupUi(self, SelectZones):
         SelectZones.setObjectName("SelectZones")  # Set the name of the window.
         SelectZones.resize(1920, 1080)  # Set the size of the window.
+        SelectZones.showMaximized()  # Set to fullscreen on start.
         self.centralwidget = QtWidgets.QWidget(SelectZones)  # Create the central widget.
         self.centralwidget.setObjectName("centralwidget")  # Set the name of the central widget.
 
@@ -116,6 +118,10 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setTickPosition(QSlider.TicksBelow)
         self.horizontalSlider.setEnabled(False)
 
+        self.contrastValueLabel = QtWidgets.QLabel(self.centralwidget)
+        self.contrastValueLabel.setGeometry(QtCore.QRect(1100, 500, 55, 16))
+        self.contrastValueLabel.setObjectName("contrastValueLabel")
+
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 480, 670, 361))
         self.groupBox.setObjectName("groupBox")
@@ -140,7 +146,7 @@ class Ui_SelectZones(object):
 
         self.mousetracker_label = QtWidgets.QLabel(self.centralwidget)  # Create the mouse tracker label.
         self.mousetracker_label.setGeometry(
-            QtCore.QRect(780, 40, 141, 16))  # Set the geometry of the mouse tracker label.
+            QtCore.QRect(780, 40, 300, 16))  # Set the geometry of the mouse tracker label.
         self.mousetracker_label.setText("")  # Set the text of the mouse tracker label.
         self.mousetracker_label.setObjectName("mousetracker_label")  # Set the name of the mouse tracker label.
 

@@ -3,11 +3,16 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QGridLayout
 
+PIXEL_VALUE = 1
+MILLIMETER_VALUE = 0.01
+MICRON_VALUE = 0.001
+
 
 class SampleGroupBox(QtWidgets.QWidget):
     def __init__(self, ui, sample_number):
         super(SampleGroupBox, self).__init__()
 
+        self.value_type = PIXEL_VALUE
         self.grid = None
         self.sample_name = None
         self.groupBox = None
@@ -113,23 +118,29 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def setX0(self):
         x0 = self.rectangle.x()
-        self.lineEditX0.setText("%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) * 0.21))
+        print(self.ui.real_width)
+        self.lineEditX0.setText(
+            "%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.value_type))
 
     def setY0(self):
         y0 = self.rectangle.y()
-        self.lineEditY0.setText("%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) * 0.21))
+        self.lineEditY0.setText(
+            "%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.value_type))
 
     def setXF(self):
         xf = self.rectangle.x() + self.rectangle.width()
-        self.lineEditXF.setText("%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) * 0.21))
+        self.lineEditXF.setText(
+            "%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.value_type))
 
     def setYF(self):
         yf = self.rectangle.y() + self.rectangle.height()
-        self.lineEditYF.setText("%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) * 0.21))
+        self.lineEditYF.setText(
+            "%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.value_type))
 
     def onX0Changed(self, text):
         try:
-            self.rectangle.setX(int(self.ui.bitmap_label.size().width() * (int(text) / 0.21) / self.ui.real_width))
+            self.rectangle.setX(
+                int(self.ui.bitmap_label.size().width() * (int(text) * self.value_type) / self.ui.real_width))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
         except ValueError:
@@ -139,7 +150,8 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def onY0Changed(self, text):
         try:
-            self.rectangle.setY(int(self.ui.bitmap_label.size().height() * (int(text) / 0.21) / self.ui.real_height))
+            self.rectangle.setY(
+                int(self.ui.bitmap_label.size().height() * (int(text) * self.value_type) / self.ui.real_height))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
             self.ui.bitmap_label.update()
@@ -149,7 +161,8 @@ class SampleGroupBox(QtWidgets.QWidget):
     def onXFChanged(self, text):
         try:
             self.rectangle.setWidth(
-                int(self.ui.bitmap_label.size().width() * (int(text) / 0.21) / self.ui.real_width) - self.rectangle.x())
+                int(self.ui.bitmap_label.size().width() * (
+                            int(text) * self.value_type) / self.ui.real_width) - self.rectangle.x())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -161,7 +174,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         try:
             self.rectangle.setHeight(
                 int(self.ui.bitmap_label.size().height() * (
-                        int(text) / 0.21) / self.ui.real_height) - self.rectangle.y())
+                        int(text) * self.value_type) / self.ui.real_height) - self.rectangle.y())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))

@@ -5,10 +5,12 @@ from os.path import exists
 
 import numpy as np
 from PIL import Image, ImageEnhance
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
+
+from sample_group_box import SampleGroupBox
 
 Image.MAX_IMAGE_PIXELS = None
 
@@ -57,6 +59,7 @@ class Event_Manager(QMainWindow):
             self.ui.pixmap = QPixmap("_resized.bmp")  # Create a QPixmap from the resized image
             self.ui.bitmap_label.pixmap = self.ui.pixmap  # Set the bitmap label to the resized image
             self.ui.bitmap_label.setPixmap(self.ui.pixmap)  # Set the bitmap label's pixmap to the QPixmap object
+            self.ui.real_width, self.ui.real_height = self.ui.original_image.size  # Get the real width and height of the image
 
             file_exists = exists("_previous_rectangles_data.txt")  # Check if the file exists
             if file_exists:  # If the file exists
@@ -69,6 +72,12 @@ class Event_Manager(QMainWindow):
                                                                int(rectangle_data[2]) - int(rectangle_data[0]),
                                                                int(rectangle_data[3]) - int(
                                                                    rectangle_data[1])))  # Create a rectangle
+                        self.ui.sample_group_boxes.append(SampleGroupBox(self.ui,
+                                                                         len(self.ui.rectangles) - 1))  # Add a sample group box to the list of sample group boxes
+                        self.ui.sample_group_boxes[-1].setX0()
+                        self.ui.sample_group_boxes[-1].setY0()
+                        self.ui.sample_group_boxes[-1].setXF()
+                        self.ui.sample_group_boxes[-1].setYF()
 
             if self.ui.image_is_displayed is False:  # If the image is not displayed
                 self.ui.flip_image_button.setEnabled(True)  # Enable the flip image button
@@ -78,6 +87,7 @@ class Event_Manager(QMainWindow):
                 self.ui.horizontalSlider.setEnabled(True)  # Enable the horizontal slider
                 self.ui.horizontalSlider.valueChanged.connect(
                     self.setContrast)  # Connect the horizontal slider to the setContrast function
+                self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))  # Set the contrast value label to the horizontal slider value
 
     # This function is used to save the bitmap data
     def saveBmpData(self):
@@ -86,7 +96,16 @@ class Event_Manager(QMainWindow):
         if directoryName:  # If the file name is not empty
             path = directoryName + "/" + self.ui.file_name
             pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-            shutil.rmtree(path)
+            try:
+                shutil.rmtree(path)
+            except OSError:
+                print(OSError)
+                msg = QMessageBox()
+                msg.setIcon(QMessageBox.Warning)
+                msg.setWindowTitle("Fichier(s) ouvert(s)")
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.setText("Veuillez fermer les fichiers ouverts avant de les écraser avec les nouveaux.")
+                x = msg.exec_()
             for rectangle in self.ui.rectangles:  # For each rectangle
                 x0 = int(self.ui.real_width * rectangle.x() / self.ui.bitmap_label.size().width())
                 xf = int(
@@ -98,8 +117,11 @@ class Event_Manager(QMainWindow):
                 path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
                     self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
                 pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-                str_iteration += 'HEADER\n\n'
-                str_iteration += 'FLIPPED = ' + str(self.ui.flipped) + '\n\n'
+                str_iteration += "HEADER\n\n"
+                str_iteration += "SP" + str(
+                    self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + '\n'
+                str_iteration += 'FLIPPED = ' + str(self.ui.flipped) + '\n'
+                str_iteration += str(rectangle.getCoords()) + ' => (X, Y, Width, Length)' + '\n\n\n'
                 str_iteration += 'Pixel X \tAverage Y Value\n\n'
                 with open(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".txt",
                           'w') as file:
@@ -116,17 +138,16 @@ class Event_Manager(QMainWindow):
                 file.close()
                 cropped_image = self.ui.original_image.crop((x0, y0, xf, yf))
                 cropped_image.save(
-                    path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".png")
+                    path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".bmp")
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     # This function is used to update the mouse tracker label
     def on_positionChanged(self, pos):
         try:
-            self.ui.real_width, self.ui.real_height = self.ui.original_image.size  # Get the real width and height of the image
-            self.ui.mousetracker_label.setText("x: %.3f, y: %.3f" % (
-                (self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width()) * 0.21,
-                (
-                        self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()) * 0.21))  # Update the mouse tracker label
+            x = int(self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width())
+            y = int(self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height())
+            self.ui.mousetracker_label.setText("x: %d, y: %d, value: %d" % (
+                x, y, int((256 ** 2) - self.ui.bitmap_data[y][x][0] ** 2) - 1))  # Update the mouse tracker label
         except AttributeError:  # If the bitmap image is not set
             pass
 
@@ -142,6 +163,7 @@ class Event_Manager(QMainWindow):
         self.ui.flipped = not self.ui.flipped  # Update the flipped boolean
 
     def setContrast(self):
+        self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))  # Update the contrast value label
         contrast_value = self.ui.horizontalSlider.value()  # Get the contrast value
         contrast = ImageEnhance.Contrast(self.ui.bitmap_label.bitmap_image)  # Create an image enhancer object
         modified_contrast_image = contrast.enhance((contrast_value - 50) / 25. + 0.5)
@@ -154,11 +176,12 @@ class Event_Manager(QMainWindow):
         self.ui.bitmap_label.update()  # Update the bitmap label
 
     def quitApp(self):
-        with open("_previous_rectangles_data.txt", 'w') as file:
-            for rectangle in self.ui.rectangles:
-                print(rectangle)
-                str_iteration = str(rectangle.getCoords()) + '\n'
-                file.write(str_iteration)
-                file.flush()
-        file.close()
+        if self.ui.bitmap_label.bitmap_image is not None:
+            with open("_previous_rectangles_data.txt", 'w') as file:
+                for rectangle in self.ui.rectangles:
+                    print(rectangle)
+                    str_iteration = str(rectangle.getCoords()) + '\n'
+                    file.write(str_iteration)
+                    file.flush()
+            file.close()
         QCoreApplication.exit(0)

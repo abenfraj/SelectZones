@@ -281,11 +281,15 @@ class BitmapLabel(QLabel):
         :return: None
         """
         if self.scale > 1:  # If the scale is greater than 1
+            qp = None  # Create a new painter
+            qs = None  # Create a new QImage
             for rectangle in self.rectangles:  # For each rectangle
                 qp = QPoint(int(rectangle.x() / 2), int(rectangle.y() / 2))  # Create a new point
                 qs = QSize(int(rectangle.width() / 2), int(rectangle.height() / 2))  # Create a new size
                 rectangle.moveTo(qp)  # Move the rectangle to the new point
                 rectangle.setSize(qs)  # Set the rectangle's size to the new size
+            self.beginning = qp  # Set the beginning point to the new point
+            self.end = QPoint(qp.x() + qs.width(), qp.y() + qs.height())  # Set the end point to the new point
             self.scale /= 2  # Decrease the scale by 2
             self.resize_image()  # Resize the image
 
