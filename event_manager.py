@@ -177,6 +177,8 @@ class Event_Manager(QMainWindow):
 
     def quitApp(self):
         if self.ui.bitmap_label.bitmap_image is not None:
+            while self.ui.bitmap_label.scale > 1:
+                self.ui.bitmap_label.on_zoom_out()
             with open("_previous_rectangles_data.txt", 'w') as file:
                 for rectangle in self.ui.rectangles:
                     print(rectangle)
