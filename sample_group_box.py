@@ -3,16 +3,9 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QGridLayout
 
-PIXEL_VALUE = 1
-MILLIMETER_VALUE = 0.01
-MICRON_VALUE = 0.001
-
-
 class SampleGroupBox(QtWidgets.QWidget):
     def __init__(self, ui, sample_number):
         super(SampleGroupBox, self).__init__()
-
-        self.value_type = PIXEL_VALUE
         self.grid = None
         self.sample_name = None
         self.groupBox = None
@@ -116,31 +109,31 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.ui.vert_lay.addWidget(self)
 
-    def setX0(self):
+    def setX0(self, number_format):
         x0 = self.rectangle.x()
         print(self.ui.real_width)
         self.lineEditX0.setText(
-            "%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.value_type))
+            number_format % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
 
-    def setY0(self):
+    def setY0(self, number_format):
         y0 = self.rectangle.y()
         self.lineEditY0.setText(
-            "%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.value_type))
+            number_format % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
 
-    def setXF(self):
+    def setXF(self, number_format):
         xf = self.rectangle.x() + self.rectangle.width()
         self.lineEditXF.setText(
-            "%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.value_type))
+            number_format % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
 
-    def setYF(self):
+    def setYF(self, number_format):
         yf = self.rectangle.y() + self.rectangle.height()
         self.lineEditYF.setText(
-            "%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.value_type))
+            number_format % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
 
     def onX0Changed(self, text):
         try:
             self.rectangle.setX(
-                int(self.ui.bitmap_label.size().width() * (int(text) * self.value_type) / self.ui.real_width))
+                int(self.ui.bitmap_label.size().width() * (int(text) * self.ui.value_type) / self.ui.real_width))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
         except ValueError:
@@ -151,7 +144,7 @@ class SampleGroupBox(QtWidgets.QWidget):
     def onY0Changed(self, text):
         try:
             self.rectangle.setY(
-                int(self.ui.bitmap_label.size().height() * (int(text) * self.value_type) / self.ui.real_height))
+                int(self.ui.bitmap_label.size().height() * (int(text) * self.ui.value_type) / self.ui.real_height))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
             self.ui.bitmap_label.update()
@@ -162,7 +155,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         try:
             self.rectangle.setWidth(
                 int(self.ui.bitmap_label.size().width() * (
-                            int(text) * self.value_type) / self.ui.real_width) - self.rectangle.x())
+                        int(text) * self.ui.value_type) / self.ui.real_width) - self.rectangle.x())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -174,7 +167,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         try:
             self.rectangle.setHeight(
                 int(self.ui.bitmap_label.size().height() * (
-                        int(text) * self.value_type) / self.ui.real_height) - self.rectangle.y())
+                        int(text) * self.ui.value_type) / self.ui.real_height) - self.rectangle.y())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -184,6 +177,12 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def updateRectangle(self, rectangle):
         self.rectangle = rectangle
+
+    def updateLineEdits(self, number_format):
+        self.setX0(number_format)
+        self.setY0(number_format)
+        self.setXF(number_format)
+        self.setYF(number_format)
 
     def remove_sample(self):
         self.ui.vert_lay.removeWidget(self)

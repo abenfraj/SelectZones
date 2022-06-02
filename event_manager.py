@@ -74,20 +74,30 @@ class Event_Manager(QMainWindow):
                                                                    rectangle_data[1])))  # Create a rectangle
                         self.ui.sample_group_boxes.append(SampleGroupBox(self.ui,
                                                                          len(self.ui.rectangles) - 1))  # Add a sample group box to the list of sample group boxes
-                        self.ui.sample_group_boxes[-1].setX0()
-                        self.ui.sample_group_boxes[-1].setY0()
-                        self.ui.sample_group_boxes[-1].setXF()
-                        self.ui.sample_group_boxes[-1].setYF()
+                        self.ui.sample_group_boxes[-1].setX0(self.ui.number_format)
+                        self.ui.sample_group_boxes[-1].setY0(self.ui.number_format)
+                        self.ui.sample_group_boxes[-1].setXF(self.ui.number_format)
+                        self.ui.sample_group_boxes[-1].setYF(self.ui.number_format)
 
             if self.ui.image_is_displayed is False:  # If the image is not displayed
                 self.ui.flip_image_button.setEnabled(True)  # Enable the flip image button
                 self.ui.flip_image_button.clicked.connect(
                     self.flip_image)  # Connect the flip image button to the flip_image function
+                self.ui.pixel_conversion_button.setEnabled(True)  # Enable the pixel convert button
+                self.ui.pixel_conversion_button.clicked.connect(
+                    self.pixel_convert)  # Connect the pixel convert button to the pixel_convert function
+                self.ui.millimeter_conversion_button.setEnabled(True)  # Enable the millimeters convert button
+                self.ui.millimeter_conversion_button.clicked.connect(
+                    self.millimeter_convert)  # Connect the millimeters convert button to the millimeters_convert function
+                self.ui.micron_conversion_button.setEnabled(True)  # Enable the microns convert button
+                self.ui.micron_conversion_button.clicked.connect(
+                    self.micron_convert)  # Connect the microns convert button to the microns_convert function
                 self.ui.image_is_displayed = True  # Set the image is displayed attribute to True
                 self.ui.horizontalSlider.setEnabled(True)  # Enable the horizontal slider
                 self.ui.horizontalSlider.valueChanged.connect(
                     self.setContrast)  # Connect the horizontal slider to the setContrast function
-                self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))  # Set the contrast value label to the horizontal slider value
+                self.ui.contrastValueLabel.setText(
+                    str(self.ui.horizontalSlider.value()))  # Set the contrast value label to the horizontal slider value
 
     # This function is used to save the bitmap data
     def saveBmpData(self):
@@ -144,10 +154,11 @@ class Event_Manager(QMainWindow):
     # This function is used to update the mouse tracker label
     def on_positionChanged(self, pos):
         try:
-            x = int(self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width())
-            y = int(self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height())
-            self.ui.mousetracker_label.setText("x: %d, y: %d, value: %d" % (
-                x, y, int((256 ** 2) - self.ui.bitmap_data[y][x][0] ** 2) - 1))  # Update the mouse tracker label
+            x = self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width() / self.ui.value_type
+            y = self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height() / self.ui.value_type
+            self.ui.mousetracker_label.setText(
+                "x: " + self.ui.number_format % x + ", y: " + self.ui.number_format % y + ", value: %d" % (
+                        int((256 ** 2) - self.ui.bitmap_data[int(y)][int(x)][0] ** 2) - 1))  # Update the mouse tracker label
         except AttributeError:  # If the bitmap image is not set
             pass
 
@@ -187,3 +198,21 @@ class Event_Manager(QMainWindow):
                     file.flush()
             file.close()
         QCoreApplication.exit(0)
+
+    def pixel_convert(self):
+        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
+            self.ui.value_type = 1
+            sample_group_box.updateLineEdits("%d")
+            self.ui.number_format = "%d"
+
+    def millimeter_convert(self):
+        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
+            self.ui.value_type = 10
+            sample_group_box.updateLineEdits("%.2f")
+            self.ui.number_format = "%.2f"
+
+    def micron_convert(self):
+        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
+            self.ui.value_type = 100
+            sample_group_box.updateLineEdits("%.3f")
+            self.ui.number_format = "%.3f"

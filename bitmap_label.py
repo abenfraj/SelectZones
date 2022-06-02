@@ -174,10 +174,10 @@ class BitmapLabel(QLabel):
         if self.bitmap_image is not None:  # If the image is not None
             self.apply_event(event)  # Apply the event
             self.state = FREE_STATE  # Set the state to free state
-            self.sample_group_boxes[-1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setXF()  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setXF(self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
             super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
 
     def mouseMoveEvent(self, event):
@@ -217,26 +217,26 @@ class BitmapLabel(QLabel):
             self.beginning.setX(event.x())  # Set the beginning point's x to the current position's x
             self.rectangles[-1] = QRect(self.beginning, self.end)  # Update the rectangle
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
         elif self.state == END_SIDE_EDIT:  # If the state is END_SIDE_EDIT
             self.end.setX(event.x())  # Set the end point's x to the current position's x
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setXF()  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setXF(self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
         elif self.state == TOP_SIDE_EDIT:  # If the state is TOP_SIDE_EDIT
             self.beginning.setY(event.y())  # Set the beginning point's y to the current position's y
             self.rectangles[-1] = QRect(self.beginning, self.end)  # Update the rectangle
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
         elif self.state == BOTTOM_SIDE_EDIT:  # If the state is BOTTOM_SIDE_EDIT
             self.end.setY(event.y())  # Set the end point's y to the current position's y
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
 
     # This method sets the image that will be displayed on the label.
     def wheelEvent(self, event):

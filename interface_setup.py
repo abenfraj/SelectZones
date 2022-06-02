@@ -39,6 +39,11 @@ class Ui_SelectZones(object):
         self.rectangles = []  # type list of Rectangle
         self.sample_group_boxes = []  # type list of QGroupBox
         self.original_image = None  # type QtGui.QImage
+        self.number_format = "%d"  # type str
+        self.pixel_conversion_button = None  # type QtWidgets.QPushButton
+        self.millimeter_conversion_button = None  # type QtWidgets.QPushButton
+        self.micron_conversion_button = None  # type QtWidgets.QPushButton
+        self.value_type = 1  # type int
 
     # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
@@ -53,6 +58,12 @@ class Ui_SelectZones(object):
         self.save_bmp_data_button.setText(
             _translate("SelectZones", "Save selected zones"))  # Set the text of the save bitmap data button.
         self.contrast_slider.setText(_translate("SelectZones", "Contrast"))
+        self.pixel_conversion_button.setText(
+            _translate("SelectZones", "Convert to pixels"))  # Set the text of the pixel conversion button.
+        self.millimeter_conversion_button.setText(
+            _translate("SelectZones", "Convert to millimeters"))  # Set the text of the millimeter conversion button.
+        self.micron_conversion_button.setText(
+            _translate("SelectZones", "Convert to microns"))  # Set the text of the micron conversion button.
 
     # This function is used to set up the interface.
     def setupUi(self, SelectZones):
@@ -76,6 +87,24 @@ class Ui_SelectZones(object):
             QtCore.QRect(420, 20, 341, 31))  # Set the geometry of the flip image button.
         self.flip_image_button.setObjectName("flip_image_button")  # Set the name of the flip image button.
         self.flip_image_button.setEnabled(False)  # Disable the flip image button.
+
+        self.pixel_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the pixel conversion button.
+        self.pixel_conversion_button.setGeometry(
+            QtCore.QRect(1660, 500, 200, 31))  # Set the geometry of the pixel conversion button.
+        self.pixel_conversion_button.setObjectName("pixel_conversion_button")  # Set the name of the pixel conversion button.
+        self.pixel_conversion_button.setEnabled(False)  # Disable the pixel conversion button.
+
+        self.millimeter_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the millimeter conversion button.
+        self.millimeter_conversion_button.setGeometry(
+            QtCore.QRect(1660, 550, 200, 31))  # Set the geometry of the millimeter conversion button.
+        self.millimeter_conversion_button.setObjectName("millimeter_conversion_button")  # Set the name of the millimeter conversion button.
+        self.millimeter_conversion_button.setEnabled(False)  # Disable the millimeter conversion button.
+
+        self.micron_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the micron conversion button.
+        self.micron_conversion_button.setGeometry(
+            QtCore.QRect(1660, 600, 200, 31))  # Set the geometry of the micron conversion button.
+        self.micron_conversion_button.setObjectName("micron_conversion_button")  # Set the name of the micron conversion button.
+        self.micron_conversion_button.setEnabled(False)  # Disable the micron conversion button.
 
         self.scrollArea = QScrollArea(self.centralwidget)  # Create the scroll area.
         self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))  # Set the geometry of the scroll area.
