@@ -3,6 +3,7 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QGridLayout
 
+
 class SampleGroupBox(QtWidgets.QWidget):
     def __init__(self, ui, sample_number):
         super(SampleGroupBox, self).__init__()
@@ -111,24 +112,36 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def setX0(self, number_format):
         x0 = self.rectangle.x()
-        print(self.ui.real_width)
-        self.lineEditX0.setText(
-            number_format % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+        try:
+            self.lineEditX0.setText(
+                number_format % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+        except RuntimeError:
+            pass
 
     def setY0(self, number_format):
         y0 = self.rectangle.y()
-        self.lineEditY0.setText(
-            number_format % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+        try:
+            self.lineEditY0.setText(
+                number_format % (
+                        (self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+        except RuntimeError:
+            pass
 
     def setXF(self, number_format):
         xf = self.rectangle.x() + self.rectangle.width()
-        self.lineEditXF.setText(
-            number_format % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+        try:
+            self.lineEditXF.setText(
+                number_format % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+        except RuntimeError:
+            pass
 
     def setYF(self, number_format):
         yf = self.rectangle.y() + self.rectangle.height()
-        self.lineEditYF.setText(
-            number_format % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+        try:
+            self.lineEditYF.setText(
+                number_format % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+        except RuntimeError:
+            pass
 
     def onX0Changed(self, text):
         try:

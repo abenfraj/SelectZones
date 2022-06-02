@@ -161,6 +161,8 @@ class Event_Manager(QMainWindow):
                         int((256 ** 2) - self.ui.bitmap_data[int(y)][int(x)][0] ** 2) - 1))  # Update the mouse tracker label
         except AttributeError:  # If the bitmap image is not set
             pass
+        except IndexError:  # If the mouse is outside the image
+            pass
 
     def flip_image(self):
         self.ui.bitmap_data = self.ui.bitmap_data[::-1]  # Flip the bitmap data
@@ -192,7 +194,6 @@ class Event_Manager(QMainWindow):
                 self.ui.bitmap_label.on_zoom_out()
             with open("_previous_rectangles_data.txt", 'w') as file:
                 for rectangle in self.ui.rectangles:
-                    print(rectangle)
                     str_iteration = str(rectangle.getCoords()) + '\n'
                     file.write(str_iteration)
                     file.flush()

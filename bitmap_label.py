@@ -173,11 +173,16 @@ class BitmapLabel(QLabel):
         """
         if self.bitmap_image is not None:  # If the image is not None
             self.apply_event(event)  # Apply the event
+            self.check_rectangle_in_image(self.rectangles[-1])  # Check if the rectangle is out of bounds
             self.state = FREE_STATE  # Set the state to free state
-            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setXF(self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setX0(
+                self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setY0(
+                self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setXF(
+                self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[-1].setYF(
+                self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
             super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
 
     def mouseMoveEvent(self, event):
@@ -190,7 +195,8 @@ class BitmapLabel(QLabel):
         if self.bitmap_image is not None:  # If the mouse is pressed and the image is not None
             super().mouseMoveEvent(event)  # Call the parent class's mouseMoveEvent method
             if self.state == FREE_STATE:  # If the state is free state
-                self.free_cursor_on_side = self.cursor_on_side(event.pos())  # Set the free cursor on side to the cursor on side of the current position
+                self.free_cursor_on_side = self.cursor_on_side(
+                    event.pos())  # Set the free cursor on side to the cursor on side of the current position
                 if self.free_cursor_on_side == CURSOR_ON_BEGIN_SIDE or self.free_cursor_on_side == CURSOR_ON_END_SIDE:  # If the cursor is on the beginning or end side
                     self.setCursor(Qt.SizeHorCursor)  # Set the cursor to a horizontal cursor
                 elif self.free_cursor_on_side == CURSOR_ON_TOP_SIDE or self.free_cursor_on_side == CURSOR_ON_BOTTOM_SIDE:  # If the cursor is on the top or bottom side
@@ -217,26 +223,34 @@ class BitmapLabel(QLabel):
             self.beginning.setX(event.x())  # Set the beginning point's x to the current position's x
             self.rectangles[-1] = QRect(self.beginning, self.end)  # Update the rectangle
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setX0(
+                self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setY0(
+                self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
         elif self.state == END_SIDE_EDIT:  # If the state is END_SIDE_EDIT
             self.end.setX(event.x())  # Set the end point's x to the current position's x
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setXF(self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setXF(
+                self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[-1].setYF(
+                self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
         elif self.state == TOP_SIDE_EDIT:  # If the state is TOP_SIDE_EDIT
             self.beginning.setY(event.y())  # Set the beginning point's y to the current position's y
             self.rectangles[-1] = QRect(self.beginning, self.end)  # Update the rectangle
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setY0(self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setY0(
+                self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setYF(
+                self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
         elif self.state == BOTTOM_SIDE_EDIT:  # If the state is BOTTOM_SIDE_EDIT
             self.end.setY(event.y())  # Set the end point's y to the current position's y
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])  # Update the rectangle
-            self.sample_group_boxes[-1].setX0(self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setX0(
+                self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setYF(
+                self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
 
     # This method sets the image that will be displayed on the label.
     def wheelEvent(self, event):
@@ -320,3 +334,23 @@ class BitmapLabel(QLabel):
         :return: None
         """
         self.end = end  # Set the end to the given end
+
+    def check_rectangle_in_image(self, rectangle):
+        """
+        This method checks if the rectangle is in the image and automatically puts it back in.
+
+        :param: rectangle: The rectangle to check.
+        :return: None
+        """
+        if rectangle.x() + rectangle.width() > self.size().width():  # RIGHT
+            rectangle.setWidth(self.size().width() - rectangle.x() - 1)
+            self.end = QPoint(self.size().width(), self.end.y())
+        if rectangle.y() + rectangle.height() > self.size().height():  # BOTTOM
+            rectangle.setHeight(self.size().height() - rectangle.y() - 1)
+            self.end = QPoint(self.end.x(), self.size().height())
+        if rectangle.x() + rectangle.width() < 0:  # LEFT
+            rectangle.setWidth(- rectangle.x() + 1)
+            self.end = QPoint(0, rectangle.y() + rectangle.height())
+        if rectangle.y() + rectangle.height() < 0:  # TOP
+            rectangle.setHeight(- rectangle.y() + 1)
+            self.end = QPoint(rectangle.x() + rectangle.width(), 0)
