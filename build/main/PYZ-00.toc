@@ -879,17 +879,20 @@
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.1264.0_x64__qbz5n2kfra8p0\\lib\\stat.py',
    'PYMODULE'),
-  ('_py_abc',
-   'C:\\Program '
-   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.1264.0_x64__qbz5n2kfra8p0\\lib\\_py_abc.py',
-   'PYMODULE'),
   ('tracemalloc',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.1264.0_x64__qbz5n2kfra8p0\\lib\\tracemalloc.py',
    'PYMODULE'),
+  ('_py_abc',
+   'C:\\Program '
+   'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.1264.0_x64__qbz5n2kfra8p0\\lib\\_py_abc.py',
+   'PYMODULE'),
   ('stringprep',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_3.10.1264.0_x64__qbz5n2kfra8p0\\lib\\stringprep.py',
+   'PYMODULE'),
+  ('main_window',
+   'D:\\Workspace\\LERMA\\SelectZones\\main_window.py',
    'PYMODULE'),
   ('interface_setup',
    'D:\\Workspace\\LERMA\\SelectZones\\interface_setup.py',

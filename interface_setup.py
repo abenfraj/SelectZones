@@ -6,21 +6,25 @@ from bitmap_label import BitmapLabel
 from mouse_tracker import MouseTracker
 
 
-# This class is used to create the interface for the application.
-
-
 class Ui_SelectZones(object):
-    # Initialize each of the widgets in the interface.
+    """
+    This class is used to create the interface.
+    """
+
     def __init__(self):
-        self.vert_lay = None
-        self.scrollAreaWidgetContents_2 = None
-        self.groupBox = None
-        self.verticalLayout_2 = None
-        self.verticalLayoutWidget = None
-        self.contrast_slider = None
-        self.scrollArea_2 = None
-        self.horizontalSlider = None
-        self.contrastValueLabel = None
+        """
+        This function is used to initialize the interface.
+        """
+
+        self.vert_lay = None  # Vertical layout
+        self.scrollAreaWidgetContents_2 = None  # Scroll area widget contents
+        self.groupBox = None  # Group box
+        self.verticalLayout_2 = None  # Vertical layout
+        self.verticalLayoutWidget = None  # Vertical layout widget
+        self.contrast_slider = None  # Contrast slider
+        self.scrollArea_2 = None  # Scroll area
+        self.horizontalSlider = None  # Horizontal slider
+        self.contrastValueLabel = None  # Contrast value label
         self.centralwidget = None  # type QtWidgets.QWidget
         self.quit_button = None  # type QtWidgets.QPushButton
         self.flip_image_button = None  # type QtWidgets.QPushButton
@@ -45,90 +49,86 @@ class Ui_SelectZones(object):
         self.micron_conversion_button = None  # type QtWidgets.QPushButton
         self.value_type = 1  # type int
 
-    # This function is used to translate the interface.
     def retranslateUi(self, SelectZones):
+        """
+        This function is used to translate the interface. It displays the titles and icons of every widget.
+
+        :param SelectZones: The interface.
+        :return: None
+        """
         _translate = QtCore.QCoreApplication.translate
-        SelectZones.setWindowTitle(_translate("SelectZones", "SelectZones"))  # Set the title of the window.
-        SelectZones.setWindowIcon(QIcon("CNRS_logo.png"))  # Set the icon of the window.
-        self.quit_button.setText(_translate("SelectZones", "Quit"))  # Set the text of the quit button.
-        self.select_bitmap_button.setText(
-            _translate("SelectZones", "Choose Bitmap"))  # Set the text of the select bitmap button.
-        self.flip_image_button.setText(
-            _translate("SelectZones", "Flip Image"))  # Set the text of the flip image button.
-        self.save_bmp_data_button.setText(
-            _translate("SelectZones", "Save selected zones"))  # Set the text of the save bitmap data button.
+        SelectZones.setWindowTitle(_translate("SelectZones", "SelectZones"))
+        SelectZones.setWindowIcon(QIcon("CNRS_logo.png"))
+        self.quit_button.setText(_translate("SelectZones", "Quit"))
+        self.select_bitmap_button.setText(_translate("SelectZones", "Choose Bitmap"))
+        self.flip_image_button.setText(_translate("SelectZones", "Flip Image"))
+        self.save_bmp_data_button.setText(_translate("SelectZones", "Save selected zones"))
         self.contrast_slider.setText(_translate("SelectZones", "Contrast"))
-        self.pixel_conversion_button.setText(
-            _translate("SelectZones", "Convert to pixels"))  # Set the text of the pixel conversion button.
-        self.millimeter_conversion_button.setText(
-            _translate("SelectZones", "Convert to millimeters"))  # Set the text of the millimeter conversion button.
-        self.micron_conversion_button.setText(
-            _translate("SelectZones", "Convert to microns"))  # Set the text of the micron conversion button.
+        self.pixel_conversion_button.setText(_translate("SelectZones", "Convert to pixels"))
+        self.millimeter_conversion_button.setText(_translate("SelectZones", "Convert to millimeters"))
+        self.micron_conversion_button.setText(_translate("SelectZones", "Convert to microns"))
 
-    # This function is used to set up the interface.
     def setupUi(self, SelectZones):
-        SelectZones.setObjectName("SelectZones")  # Set the name of the window.
-        SelectZones.resize(1920, 1080)  # Set the size of the window.
-        SelectZones.showMaximized()  # Set to fullscreen on start.
-        self.centralwidget = QtWidgets.QWidget(SelectZones)  # Create the central widget.
-        self.centralwidget.setObjectName("centralwidget")  # Set the name of the central widget.
+        """
+        This function is used to create/define the interface.
 
-        self.quit_button = QtWidgets.QPushButton(self.centralwidget)  # Create the quit button.
-        self.quit_button.setGeometry(QtCore.QRect(1500, 20, 341, 28))  # Set the geometry of the quit button.
-        self.quit_button.setObjectName("quit_button")  # Set the name of the quit button.
+        :param SelectZones: The interface.
+        :return: None
+        """
+        SelectZones.setObjectName("SelectZones")
+        SelectZones.resize(1920, 1080)
+        SelectZones.showMaximized()
+        self.centralwidget = QtWidgets.QWidget(SelectZones)
+        self.centralwidget.setObjectName("centralwidget")
 
-        self.select_bitmap_button = QtWidgets.QPushButton(self.centralwidget)  # Create the select bitmap button.
-        self.select_bitmap_button.setGeometry(
-            QtCore.QRect(60, 20, 341, 31))  # Set the geometry of the select bitmap button.
-        self.select_bitmap_button.setObjectName("select_bitmap_button")  # Set the name of the select bitmap button.
+        self.quit_button = QtWidgets.QPushButton(self.centralwidget)
+        self.quit_button.setGeometry(QtCore.QRect(1500, 20, 341, 28))
+        self.quit_button.setObjectName("quit_button")
 
-        self.flip_image_button = QtWidgets.QPushButton(self.centralwidget)  # Create the flip image button.
-        self.flip_image_button.setGeometry(
-            QtCore.QRect(420, 20, 341, 31))  # Set the geometry of the flip image button.
-        self.flip_image_button.setObjectName("flip_image_button")  # Set the name of the flip image button.
-        self.flip_image_button.setEnabled(False)  # Disable the flip image button.
+        self.select_bitmap_button = QtWidgets.QPushButton(self.centralwidget)
+        self.select_bitmap_button.setGeometry(QtCore.QRect(60, 20, 341, 31))
+        self.select_bitmap_button.setObjectName("select_bitmap_button")
 
-        self.pixel_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the pixel conversion button.
-        self.pixel_conversion_button.setGeometry(
-            QtCore.QRect(1660, 500, 200, 31))  # Set the geometry of the pixel conversion button.
-        self.pixel_conversion_button.setObjectName("pixel_conversion_button")  # Set the name of the pixel conversion button.
-        self.pixel_conversion_button.setEnabled(False)  # Disable the pixel conversion button.
+        self.flip_image_button = QtWidgets.QPushButton(self.centralwidget)
+        self.flip_image_button.setGeometry(QtCore.QRect(420, 20, 341, 31))
+        self.flip_image_button.setObjectName("flip_image_button")
+        self.flip_image_button.setEnabled(False)
 
-        self.millimeter_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the millimeter conversion button.
-        self.millimeter_conversion_button.setGeometry(
-            QtCore.QRect(1660, 550, 200, 31))  # Set the geometry of the millimeter conversion button.
-        self.millimeter_conversion_button.setObjectName("millimeter_conversion_button")  # Set the name of the millimeter conversion button.
-        self.millimeter_conversion_button.setEnabled(False)  # Disable the millimeter conversion button.
+        self.pixel_conversion_button = QtWidgets.QPushButton(self.centralwidget)
+        self.pixel_conversion_button.setGeometry(QtCore.QRect(1660, 500, 200, 31))
+        self.pixel_conversion_button.setObjectName("pixel_conversion_button")
+        self.pixel_conversion_button.setEnabled(False)
 
-        self.micron_conversion_button = QtWidgets.QPushButton(self.centralwidget)  # Create the micron conversion button.
-        self.micron_conversion_button.setGeometry(
-            QtCore.QRect(1660, 600, 200, 31))  # Set the geometry of the micron conversion button.
-        self.micron_conversion_button.setObjectName("micron_conversion_button")  # Set the name of the micron conversion button.
-        self.micron_conversion_button.setEnabled(False)  # Disable the micron conversion button.
+        self.millimeter_conversion_button = QtWidgets.QPushButton(self.centralwidget)
+        self.millimeter_conversion_button.setGeometry(QtCore.QRect(1660, 550, 200, 31))
+        self.millimeter_conversion_button.setObjectName("millimeter_conversion_button")
+        self.millimeter_conversion_button.setEnabled(False)
 
-        self.scrollArea = QScrollArea(self.centralwidget)  # Create the scroll area.
-        self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))  # Set the geometry of the scroll area.
-        self.scrollArea.setWidgetResizable(True)  # Set the scroll area to be resizable.
-        self.scrollArea.setObjectName("scrollArea")  # Set the name of the scroll area.
+        self.micron_conversion_button = QtWidgets.QPushButton(self.centralwidget)
+        self.micron_conversion_button.setGeometry(QtCore.QRect(1660, 600, 200, 31))
+        self.micron_conversion_button.setObjectName("micron_conversion_button")
+        self.micron_conversion_button.setEnabled(False)
 
-        self.scrollAreaWidgetContents = QtWidgets.QWidget()  # Create the scroll area widget contents.
-        self.scrollAreaWidgetContents.setGeometry(
-            QtCore.QRect(0, 0, 1859, 389))  # Set the geometry of the scroll area widget contents.
-        self.scrollAreaWidgetContents.setObjectName(
-            "scrollAreaWidgetContents")  # Set the name of the scroll area widget contents.
+        self.scrollArea = QScrollArea(self.centralwidget)
+        self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
 
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)  # Create the vertical layout.
-        self.verticalLayout.setObjectName("verticalLayout")  # Set the name of the vertical layout.
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1859, 389))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
 
-        self.bitmap_label = BitmapLabel(self)  # Create the bitmap label.
-        self.bitmap_label.setText("")  # Set the text of the bitmap label.
-        self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)  # Set the alignment of the bitmap label.
-        self.bitmap_label.setObjectName("bitmap_label")  # Set the name of the bitmap label.
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout.setObjectName("verticalLayout")
 
-        self.verticalLayout.addWidget(self.bitmap_label)  # Add the bitmap label to the vertical layout.
+        self.bitmap_label = BitmapLabel(self)
+        self.bitmap_label.setText("")
+        self.bitmap_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.bitmap_label.setObjectName("bitmap_label")
 
-        self.scrollArea.setWidget(
-            self.scrollAreaWidgetContents)  # Set the scroll area to the scroll area widget contents.
+        self.verticalLayout.addWidget(self.bitmap_label)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.contrast_slider = QtWidgets.QLabel(self.centralwidget)
         self.contrast_slider.setGeometry(QtCore.QRect(750, 500, 55, 16))
@@ -142,8 +142,8 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setMaximum(500)
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setTickInterval(1)
-        self.horizontalSlider.setSingleStep(10)  # arrow-key step-size
-        self.horizontalSlider.setPageStep(10)  # mouse-wheel/page-key step-size
+        self.horizontalSlider.setSingleStep(10)
+        self.horizontalSlider.setPageStep(10)
         self.horizontalSlider.setTickPosition(QSlider.TicksBelow)
         self.horizontalSlider.setEnabled(False)
 
@@ -168,24 +168,24 @@ class Ui_SelectZones(object):
         self.vert_lay = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.vert_lay.setObjectName("vert_lay")
 
-        self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)  # Create the save bitmap data button.
+        self.save_bmp_data_button = QtWidgets.QPushButton(self.centralwidget)
         self.save_bmp_data_button.setGeometry(
-            QtCore.QRect(780, 780, 331, 28))  # Set the geometry of the save bitmap data button.
-        self.save_bmp_data_button.setObjectName("save_bmp_data_button")  # Set the name of the save bitmap data button.
+            QtCore.QRect(780, 780, 331, 28))
+        self.save_bmp_data_button.setObjectName("save_bmp_data_button")
 
-        self.mousetracker_label = QtWidgets.QLabel(self.centralwidget)  # Create the mouse tracker label.
+        self.mousetracker_label = QtWidgets.QLabel(self.centralwidget)
         self.mousetracker_label.setGeometry(
-            QtCore.QRect(780, 40, 300, 16))  # Set the geometry of the mouse tracker label.
-        self.mousetracker_label.setText("")  # Set the text of the mouse tracker label.
-        self.mousetracker_label.setObjectName("mousetracker_label")  # Set the name of the mouse tracker label.
+            QtCore.QRect(780, 40, 300, 16))
+        self.mousetracker_label.setText("")
+        self.mousetracker_label.setObjectName("mousetracker_label")
 
-        SelectZones.setCentralWidget(self.centralwidget)  # Set the central widget to the window.
+        SelectZones.setCentralWidget(self.centralwidget)
 
-        self.statusbar = QtWidgets.QStatusBar(SelectZones)  # Create the status bar.
-        self.statusbar.setObjectName("statusbar")  # Set the name of the status bar.
-        SelectZones.setStatusBar(self.statusbar)  # Set the status bar to the window.
+        self.statusbar = QtWidgets.QStatusBar(SelectZones)
+        self.statusbar.setObjectName("statusbar")
+        SelectZones.setStatusBar(self.statusbar)
 
-        self.mouse_tracker = MouseTracker(self.bitmap_label)  # Create the mouse tracker.
+        self.mouse_tracker = MouseTracker(self.bitmap_label)
 
-        self.retranslateUi(SelectZones)  # Translate the UI.
-        QtCore.QMetaObject.connectSlotsByName(SelectZones)  # Connect the slots.
+        self.retranslateUi(SelectZones)
+        QtCore.QMetaObject.connectSlotsByName(SelectZones)

@@ -5,7 +5,17 @@ from PyQt5.QtWidgets import QGridLayout
 
 
 class SampleGroupBox(QtWidgets.QWidget):
+    """
+    This class is used to create a group box containing the rectangle coordinates.
+    """
     def __init__(self, ui, sample_number):
+        """
+        This function is used to initialize the class.
+
+        :param ui: The main window.
+        :param sample_number: The number of the sample.
+        """
+
         super(SampleGroupBox, self).__init__()
         self.grid = None
         self.sample_name = None
@@ -31,9 +41,15 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.centralwidget = self.ui.centralwidget
         self.scrollArea_2 = self.ui.scrollArea_2
 
-        self.init_ui()
+        self.initUi()
 
-    def init_ui(self):
+    def initUi(self):
+        """
+        This function is used to create/define the interface of this custom widget.
+
+        :return: None
+        """
+
         self.labelX0 = QtWidgets.QLabel(self.groupBox)
         self.labelY0 = QtWidgets.QLabel(self.groupBox)
         self.labelXF = QtWidgets.QLabel(self.groupBox)
@@ -47,7 +63,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.removeButton = QtWidgets.QPushButton(self.groupBox)
         self.removeButton.setIcon(QIcon("Red-Close-Button-Transparent.png"))
         self.removeButton.setIconSize(QtCore.QSize(20, 20))
-        self.removeButton.clicked.connect(self.remove_sample)
+        self.removeButton.clicked.connect(self.removeSample)
 
         lay = QtWidgets.QVBoxLayout(self)
         box = QtWidgets.QGroupBox()
@@ -111,6 +127,13 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.ui.vert_lay.addWidget(self)
 
     def setX0(self, number_format):
+        """
+        This function is used to set the x0 value of the sample.
+
+        :param number_format: The x0 value of the sample.
+        :return: None
+        """
+
         x0 = self.rectangle.x()
         try:
             self.lineEditX0.setText(
@@ -119,6 +142,12 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def setY0(self, number_format):
+        """
+        This function is used to set the y0 value of the sample.
+
+        :param number_format: The y0 value of the sample.
+        :return: None
+        """
         y0 = self.rectangle.y()
         try:
             self.lineEditY0.setText(
@@ -128,6 +157,12 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def setXF(self, number_format):
+        """
+        This function is used to set the xf value of the sample.
+
+        :param number_format: The xf value of the sample.
+        :return: None
+        """
         xf = self.rectangle.x() + self.rectangle.width()
         try:
             self.lineEditXF.setText(
@@ -136,6 +171,13 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def setYF(self, number_format):
+        """
+        This function is used to set the yf value of the sample.
+
+        :param number_format: The yf value of the sample.
+        :return: None
+        """
+
         yf = self.rectangle.y() + self.rectangle.height()
         try:
             self.lineEditYF.setText(
@@ -144,6 +186,13 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def onX0Changed(self, text):
+        """
+        This function is used to set the x0 value of the sample.
+
+        :param text: The x0 value of the sample.
+        :return: None
+        """
+
         try:
             self.rectangle.setX(
                 int(self.ui.bitmap_label.size().width() * (int(text) * self.ui.value_type) / self.ui.real_width))
@@ -155,6 +204,13 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.ui.bitmap_label.update()
 
     def onY0Changed(self, text):
+        """
+        This function is used to set the y0 value of the sample.
+
+        :param text: The y0 value of the sample.
+        :return: None
+        """
+
         try:
             self.rectangle.setY(
                 int(self.ui.bitmap_label.size().height() * (int(text) * self.ui.value_type) / self.ui.real_height))
@@ -165,6 +221,13 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def onXFChanged(self, text):
+        """
+        This function is used to set the xf value of the sample.
+
+        :param text: The xf value of the sample.
+        :return: None
+        """
+
         try:
             self.rectangle.setWidth(
                 int(self.ui.bitmap_label.size().width() * (
@@ -177,6 +240,13 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def onYFChanged(self, text):
+        """
+        This function is used to set the yf value of the sample.
+
+        :param text: The yf value of the sample.
+        :return: None
+        """
+
         try:
             self.rectangle.setHeight(
                 int(self.ui.bitmap_label.size().height() * (
@@ -189,15 +259,35 @@ class SampleGroupBox(QtWidgets.QWidget):
             pass
 
     def updateRectangle(self, rectangle):
+        """
+        This function is used to update the rectangle.
+
+        :param rectangle: The rectangle to update.
+        :return: None
+        """
+
         self.rectangle = rectangle
 
     def updateLineEdits(self, number_format):
+        """
+        This function is used to update the line edits.
+
+        :param number_format: The number format.
+        :return: None
+        """
+
         self.setX0(number_format)
         self.setY0(number_format)
         self.setXF(number_format)
         self.setYF(number_format)
 
-    def remove_sample(self):
+    def removeSample(self):
+        """
+        This function is used to remove the sample.
+
+        :return: None
+        """
+
         self.ui.vert_lay.removeWidget(self)
         self.deleteLater()
         self.ui.rectangles.remove(self.rectangle)
