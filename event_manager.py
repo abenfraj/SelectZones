@@ -1,5 +1,6 @@
 import os
 import pathlib
+import re
 import shutil
 from os.path import exists
 
@@ -90,13 +91,13 @@ class Event_Manager(QMainWindow):
                     rectangle_data = rectangle_data[rectangle_data.find("(") + 1:rectangle_data.find(")")].split(
                         ", ")
                     self.ui.rectangles.append(QtCore.QRect(int(rectangle_data[0]), int(rectangle_data[1]),
-                                                           int(rectangle_data[2]) - int(rectangle_data[0]),
-                                                           int(rectangle_data[3]) - int(rectangle_data[1])))
+                                                           int(rectangle_data[2]) - int(rectangle_data[0]) + 1,
+                                                           int(rectangle_data[3]) - int(rectangle_data[1]) + 1))
                     self.ui.sample_group_boxes.append(SampleGroupBox(self.ui, len(self.ui.rectangles) - 1))
-                    self.ui.sample_group_boxes[-1].setX0(self.ui.number_format)
-                    self.ui.sample_group_boxes[-1].setY0(self.ui.number_format)
-                    self.ui.sample_group_boxes[-1].setXF(self.ui.number_format)
-                    self.ui.sample_group_boxes[-1].setYF(self.ui.number_format)
+                    self.ui.sample_group_boxes[-1].setX0()
+                    self.ui.sample_group_boxes[-1].setY0()
+                    self.ui.sample_group_boxes[-1].setXF()
+                    self.ui.sample_group_boxes[-1].setYF()
 
     def enableWidgets(self):
         """
@@ -108,16 +109,16 @@ class Event_Manager(QMainWindow):
         if self.ui.image_is_displayed is False:
             self.ui.flip_image_button.setEnabled(True)
             self.ui.flip_image_button.clicked.connect(self.flipImage)
-            self.ui.pixel_conversion_button.setEnabled(True)
-            self.ui.pixel_conversion_button.clicked.connect(self.pixelConvert)
-            self.ui.millimeter_conversion_button.setEnabled(True)
-            self.ui.millimeter_conversion_button.clicked.connect(self.millimeterConvert)
-            self.ui.micron_conversion_button.setEnabled(True)
-            self.ui.micron_conversion_button.clicked.connect(self.micronConvert)
             self.ui.image_is_displayed = True
             self.ui.horizontalSlider.setEnabled(True)
             self.ui.horizontalSlider.valueChanged.connect(self.setContrast)
             self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))
+            self.ui.conversion_factor_button.setEnabled(True)
+            self.ui.conversion_factor_button.clicked.connect(self.setConversionFactor)
+            self.ui.conversion_factor_line_edit.setEnabled(True)
+            self.ui.conversion_factor_line_edit.textChanged.connect(self.setConversionFactor)
+            self.ui.conversion_factor_line_edit.setValidator(
+                QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+[,.]?[0-9]*([\/][0-9]+[,.]?[0-9]*)*\/?")))
 
     def saveBmpData(self):
         """
@@ -135,7 +136,6 @@ class Event_Manager(QMainWindow):
             try:
                 shutil.rmtree(path)
             except OSError:
-                print(OSError)
                 msg = QMessageBox()
                 msg.setIcon(QMessageBox.Warning)
                 msg.setWindowTitle("File(s) still open")
@@ -155,22 +155,45 @@ class Event_Manager(QMainWindow):
                 str_iteration += "HEADER\n\n"
                 str_iteration += "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + '\n'
                 str_iteration += 'FLIPPED = ' + str(self.ui.flipped) + '\n'
-                str_iteration += str(rectangle.getCoords()) + ' => (X, Y, Width, Length)' + '\n\n\n'
-                str_iteration += 'Pixel X \tAverage Y Value\n\n'
+                str_iteration += "(" + self.ui.sample_group_boxes[
+                    self.ui.rectangles.index(rectangle)].lineEditX0.text() + ", " + self.ui.sample_group_boxes[
+                                     self.ui.rectangles.index(rectangle)].lineEditY0.text() + ", " + \
+                                 self.ui.sample_group_boxes[
+                                     self.ui.rectangles.index(rectangle)].lineEditXF.text() + ", " + \
+                                 self.ui.sample_group_boxes[
+                                     self.ui.rectangles.index(
+                                         rectangle)].lineEditYF.text() + ") => (X0, Y0, XF, YF)" + "\n"
+                str_iteration += "Conversion factor in pixel per millimeter = " + str(
+                    self.ui.value_type) + " (default value is 100)\n\n\n"
+                str_iteration += 'X Value \tAverage Y Value\n\n'
                 with open(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".txt",
                           'w') as file:
+                    file.write(str_iteration)
+                    file.flush()
+                    str_iteration = ''
                     for x in range(x0, xf):
                         average_value = 0
                         for y in range(y0, yf):
-                            np_sum = (256 ** 2) - (int(self.ui.bitmap_data[y][x][0]) ** 2)
+                            np_sum = 256 - int(self.ui.bitmap_data[y][x][0]) - 1
                             average_value += np_sum
-                        average_value /= (yf - y0 + 1)
-                        str_iteration += str("{:.3f}".format(x / 100)) + "\t\t" + str(int(average_value)) + '\n'
+                            print(np_sum, average_value)
+                        average_value /= (yf - y0)
+                        str_iteration += str("{:.3f}".format(x / self.ui.value_type)) + "\t\t" + str(
+                            int(average_value)) + '\n'
                         file.write(str_iteration)
                         file.flush()
                         str_iteration = ''
                 file.close()
-                cropped_image = self.ui.original_image.crop((x0, y0, xf, yf))
+                try:
+                    cropped_image = self.ui.original_image.crop((x0, y0, xf, yf))
+                except ValueError:
+                    try:
+                        cropped_image = self.ui.original_image.crop((xf, yf, x0, y0))
+                    except ValueError:
+                        try:
+                            cropped_image = self.ui.original_image.crop((x0, yf, xf, y0))
+                        except ValueError:
+                            cropped_image = self.ui.original_image.crop((xf, y0, x0, yf))
                 cropped_image.save(
                     path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".bmp")
 
@@ -184,14 +207,17 @@ class Event_Manager(QMainWindow):
         :return: None
         """
         try:
-            x = self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width() / self.ui.value_type
-            y = self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height() / self.ui.value_type
+            x = self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width()
+            y = self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()
             self.ui.mousetracker_label.setText(
-                "x: " + self.ui.number_format % x + ", y: " + self.ui.number_format % y + ", value: %d" % (
-                        int((256 ** 2) - self.ui.bitmap_data[int(y)][int(x)][0] ** 2) - 1))
-        except AttributeError:
-            pass
+                "x: " + "%.3f" % (x / self.ui.value_type) + ", y: " + "%.3f" % (
+                        y / self.ui.value_type) + ", value: %d" % (
+                        256 - self.ui.bitmap_data[int(y)][int(x)][0] - 1))
         except IndexError:
+            pass
+        except TypeError:
+            pass
+        except AttributeError:
             pass
 
     def flipImage(self):
@@ -247,35 +273,35 @@ class Event_Manager(QMainWindow):
             file.close()
         QCoreApplication.exit(0)
 
-    def pixelConvert(self):
+    def setConversionFactor(self):
         """
-        This function is used to convert the image to a pixel-based representation.
+        This function is used to set the conversion factor that is entered in the line edit.
 
         :return: None
         """
-        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
-            self.ui.value_type = 1
-            sample_group_box.updateLineEdits("%d")
-            self.ui.number_format = "%d"
+        if self.isFractionValid(self.ui.conversion_factor_line_edit.text()):
+            self.ui.value_type = self.convertToFloat(self.ui.conversion_factor_line_edit.text())
+        else:
+            try:
+                self.ui.value_type = float(self.ui.conversion_factor_line_edit.text())
+            except ValueError:
+                pass
 
-    def millimeterConvert(self):
-        """
-        This function is used to convert the image to a millimeter-based representation.
+    @staticmethod
+    def convertToFloat(frac_str):
+        try:
+            return float(frac_str)
+        except ValueError:
+            num, denominator = frac_str.split('/')
+            try:
+                leading, num = num.split(' ')
+                whole = float(leading)
+            except ValueError:
+                whole = 0
+            frac = float(num) / float(denominator)
+            return whole - frac if whole < 0 else whole + frac
 
-        :return: None
-        """
-        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
-            self.ui.value_type = 100
-            sample_group_box.updateLineEdits("%.2f")
-            self.ui.number_format = "%.2f"
-
-    def micronConvert(self):
-        """
-        This function is used to convert the image to a micron-based representation.
-
-        :return: None
-        """
-        for sample_group_box in self.ui.bitmap_label.sample_group_boxes:
-            self.ui.value_type = 0.1
-            sample_group_box.updateLineEdits("%d")
-            self.ui.number_format = "%d"
+    @staticmethod
+    def isFractionValid(string):
+        values = string.split('/')
+        return len(values) == 2 and all(i.isdigit() for i in values)

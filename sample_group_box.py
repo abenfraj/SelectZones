@@ -8,6 +8,7 @@ class SampleGroupBox(QtWidgets.QWidget):
     """
     This class is used to create a group box containing the rectangle coordinates.
     """
+
     def __init__(self, ui, sample_number):
         """
         This function is used to initialize the class.
@@ -85,22 +86,22 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.lineEditX0.setGeometry(QtCore.QRect(150, 20, 61, 22))
         self.lineEditX0.setObjectName("lineEditX0" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditX0.textEdited[str].connect(self.onX0Changed)
 
         self.lineEditY0.setGeometry(QtCore.QRect(250, 20, 61, 22))
         self.lineEditY0.setObjectName("lineEditY0" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditY0.textEdited[str].connect(self.onY0Changed)
 
         self.lineEditXF.setGeometry(QtCore.QRect(390, 20, 61, 22))
         self.lineEditXF.setObjectName("lineEditXF" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditXF.textEdited[str].connect(self.onXFChanged)
 
         self.lineEditYF.setGeometry(QtCore.QRect(480, 20, 61, 22))
         self.lineEditYF.setObjectName("lineEditYF" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
         self.lineEditYF.textEdited[str].connect(self.onYFChanged)
 
         self.sample_name.setText("Sample " + str(self.sample_number + 1) + ":  ")
@@ -126,68 +127,63 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.ui.vert_lay.addWidget(self)
 
-    def setX0(self, number_format):
+    def setX0(self):
         """
         This function is used to set the x0 value of the sample.
 
-        :param number_format: The x0 value of the sample.
         :return: None
         """
 
         x0 = self.rectangle.x()
         try:
             self.lineEditX0.setText(
-                number_format % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+                "%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
         except RuntimeError:
             pass
 
-    def setY0(self, number_format):
+    def setY0(self):
         """
         This function is used to set the y0 value of the sample.
 
-        :param number_format: The y0 value of the sample.
         :return: None
         """
         y0 = self.rectangle.y()
         try:
             self.lineEditY0.setText(
-                number_format % (
-                        (self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+                "%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
         except RuntimeError:
             pass
 
-    def setXF(self, number_format):
+    def setXF(self):
         """
         This function is used to set the xf value of the sample.
 
-        :param number_format: The xf value of the sample.
         :return: None
         """
         xf = self.rectangle.x() + self.rectangle.width()
         try:
             self.lineEditXF.setText(
-                number_format % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+                "%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
         except RuntimeError:
             pass
 
-    def setYF(self, number_format):
+    def setYF(self):
         """
         This function is used to set the yf value of the sample.
 
-        :param number_format: The yf value of the sample.
         :return: None
         """
 
         yf = self.rectangle.y() + self.rectangle.height()
         try:
             self.lineEditYF.setText(
-                number_format % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+                "%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
         except RuntimeError:
             pass
 
     def onX0Changed(self, text):
         """
-        This function is used to set the x0 value of the sample.
+        This function is used to set the x0 value of the sample when the text is changed.
 
         :param text: The x0 value of the sample.
         :return: None
@@ -205,7 +201,7 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def onY0Changed(self, text):
         """
-        This function is used to set the y0 value of the sample.
+        This function is used to set the y0 value of the sample when the text is changed.
 
         :param text: The y0 value of the sample.
         :return: None
@@ -222,7 +218,7 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def onXFChanged(self, text):
         """
-        This function is used to set the xf value of the sample.
+        This function is used to set the xf value of the sample when the text is changed.
 
         :param text: The xf value of the sample.
         :return: None
@@ -241,7 +237,7 @@ class SampleGroupBox(QtWidgets.QWidget):
 
     def onYFChanged(self, text):
         """
-        This function is used to set the yf value of the sample.
+        This function is used to set the yf value of the sample when the text is changed.
 
         :param text: The yf value of the sample.
         :return: None
@@ -268,18 +264,17 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.rectangle = rectangle
 
-    def updateLineEdits(self, number_format):
+    def updateLineEdits(self):
         """
         This function is used to update the line edits.
 
-        :param number_format: The number format.
         :return: None
         """
 
-        self.setX0(number_format)
-        self.setY0(number_format)
-        self.setXF(number_format)
-        self.setYF(number_format)
+        self.setX0()
+        self.setY0()
+        self.setXF()
+        self.setYF()
 
     def removeSample(self):
         """
@@ -291,6 +286,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.ui.vert_lay.removeWidget(self)
         self.deleteLater()
         self.ui.rectangles.remove(self.rectangle)
+        self.ui.sample_group_boxes.remove(self)
         self.ui.bitmap_label.update()
         new_beginning = QPoint()
         new_end = QPoint()
@@ -299,3 +295,51 @@ class SampleGroupBox(QtWidgets.QWidget):
             new_end = QPoint(self.ui.rectangles[-1].getCoords()[2], self.ui.rectangles[-1].getCoords()[3])
         self.ui.bitmap_label.setBeginning(new_beginning)
         self.ui.bitmap_label.setEnd(new_end)
+
+    def setXFToTopLeft(self):
+        """
+        This function is used to set the xf value to (0, 0).
+
+        :return: None
+        """
+
+        try:
+            self.lineEditXF.setText("%.3f" % 0)
+        except RuntimeError:
+            pass
+
+    def setYFToTopLeft(self):
+        """
+        This function is used to set the yf value to (0, 0).
+
+        :return: None
+        """
+
+        try:
+            self.lineEditYF.setText("%.3f" % 0)
+        except RuntimeError:
+            pass
+
+    def setXFToBottomRight(self):
+        """
+        This function is used to set the xf value of the sample.
+
+        :return: None
+        """
+
+        try:
+            self.lineEditXF.setText("%.3f" % ((self.ui.real_width - 1) / self.ui.value_type))
+        except RuntimeError:
+            pass
+
+    def setYFToBottomRight(self):
+        """
+        This function is used to set the yf value of the sample.
+
+        :return: None
+        """
+
+        try:
+            self.lineEditYF.setText("%.3f" % ((self.ui.real_height - 1) / self.ui.value_type))
+        except RuntimeError:
+            pass

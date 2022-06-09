@@ -173,16 +173,12 @@ class BitmapLabel(QLabel):
 
         if self.bitmap_image is not None:  # If the image is not None
             self.applyEvent(event)  # Apply the event
-            self.checkRectangleInImage(self.rectangles[-1])  # Check if the rectangle is out of bounds
             self.state = FREE_STATE  # Set the state to free state
-            self.sample_group_boxes[-1].setX0(
-                self.ui.number_format)  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0(
-                self.ui.number_format)  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setXF(
-                self.ui.number_format)  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF(
-                self.ui.number_format)  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.sample_group_boxes[-1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[-1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[-1].setXF()  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.checkRectangleInImage(self.rectangles[-1])  # Check if the rectangle is out of bounds
             super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
 
     def mouseMoveEvent(self, event):
@@ -228,26 +224,26 @@ class BitmapLabel(QLabel):
             self.beginning.setX(event.x())
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
-            self.sample_group_boxes[-1].setX0(self.ui.number_format)
-            self.sample_group_boxes[-1].setY0(self.ui.number_format)
+            self.sample_group_boxes[-1].setX0()
+            self.sample_group_boxes[-1].setY0()
         elif self.state == END_SIDE_EDIT:
             self.end.setX(event.x())
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
-            self.sample_group_boxes[-1].setXF(self.ui.number_format)
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)
+            self.sample_group_boxes[-1].setXF()
+            self.sample_group_boxes[-1].setYF()
         elif self.state == TOP_SIDE_EDIT:
             self.beginning.setY(event.y())
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
-            self.sample_group_boxes[-1].setY0(self.ui.number_format)
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)
+            self.sample_group_boxes[-1].setY0()
+            self.sample_group_boxes[-1].setYF()
         elif self.state == BOTTOM_SIDE_EDIT:
             self.end.setY(event.y())
             self.rectangles[-1] = QRect(self.beginning, self.end)
             self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
-            self.sample_group_boxes[-1].setX0(self.ui.number_format)
-            self.sample_group_boxes[-1].setYF(self.ui.number_format)
+            self.sample_group_boxes[-1].setX0()
+            self.sample_group_boxes[-1].setYF()
 
     def wheelEvent(self, event):
         """
@@ -347,14 +343,44 @@ class BitmapLabel(QLabel):
         """
 
         if rectangle.x() + rectangle.width() > self.size().width():
-            rectangle.setWidth(self.size().width() - rectangle.x() - 1)
-            self.end = QPoint(self.size().width(), self.end.y())
+            rectangle.setRight(self.ui.bitmap_label.width() - 1)
+            self.sample_group_boxes[-1].updateRectangle(rectangle)
+            self.sample_group_boxes[-1].setXFToBottomRight()
+            self.end = QPoint(rectangle.right(), self.end.y())
         if rectangle.y() + rectangle.height() > self.size().height():
-            rectangle.setHeight(self.size().height() - rectangle.y() - 1)
-            self.end = QPoint(self.end.x(), self.size().height())
+            rectangle.setBottom(self.ui.bitmap_label.height() - 1)
+            self.sample_group_boxes[-1].updateRectangle(rectangle)
+            self.sample_group_boxes[-1].setYFToBottomRight()
+            self.end = QPoint(self.end.x(), rectangle.bottom())
         if rectangle.x() + rectangle.width() < 0:
-            rectangle.setWidth(- rectangle.x() + 1)
-            self.end = QPoint(0, rectangle.y() + rectangle.height())
+            rectangle.setRight(0)
+            self.sample_group_boxes[-1].updateRectangle(rectangle)
+            self.sample_group_boxes[-1].setXFToTopLeft()
+            self.end = QPoint(rectangle.right(), self.end.y())
         if rectangle.y() + rectangle.height() < 0:
-            rectangle.setHeight(- rectangle.y() + 1)
-            self.end = QPoint(rectangle.x() + rectangle.width(), 0)
+            rectangle.setBottom(0)
+            self.sample_group_boxes[-1].updateRectangle(rectangle)
+            self.sample_group_boxes[-1].setYFToTopLeft()
+            self.end = QPoint(self.end.x(), rectangle.bottom())
+
+    def swapY0YF(self):
+        """
+        This method swaps the Y0 and YF values of the rectangle.
+
+        :return: None
+        """
+        if self.sample_group_boxes[-1].getY0() > self.sample_group_boxes[-1].getYF():
+            tmpYF = self.sample_group_boxes[-1].getYF()
+            self.sample_group_boxes[-1].setYF(self.sample_group_boxes[-1].getY0())
+            self.sample_group_boxes[-1].setY0(tmpYF)
+
+    def swapX0XF(self):
+        """
+        This method swaps the X0 and XF values of the rectangle.
+
+        :return: None
+        """
+        if self.sample_group_boxes[-1].getX0() > self.sample_group_boxes[-1].getXF():
+            tmpXF = self.sample_group_boxes[-1].getXF()
+            self.sample_group_boxes[-1].setXF(self.sample_group_boxes[-1].getX0())
+            self.sample_group_boxes[-1].setX0(tmpXF)

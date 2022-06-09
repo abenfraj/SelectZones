@@ -44,10 +44,10 @@ class Ui_SelectZones(object):
         self.sample_group_boxes = []  # type list of QGroupBox
         self.original_image = None  # type QtGui.QImage
         self.number_format = "%d"  # type str
-        self.pixel_conversion_button = None  # type QtWidgets.QPushButton
-        self.millimeter_conversion_button = None  # type QtWidgets.QPushButton
-        self.micron_conversion_button = None  # type QtWidgets.QPushButton
-        self.value_type = 1  # type int
+        self.conversion_factor_label = None  # type QWidget.QLabel
+        self.conversion_factor_line_edit = None  # type QWidget.QLineEdit
+        self.conversion_factor_button = None  # type QtWidgets.QPushButton
+        self.value_type = 100  # type int
 
     def retranslateUi(self, SelectZones):
         """
@@ -64,9 +64,8 @@ class Ui_SelectZones(object):
         self.flip_image_button.setText(_translate("SelectZones", "Flip Image"))
         self.save_bmp_data_button.setText(_translate("SelectZones", "Save selected zones"))
         self.contrast_slider.setText(_translate("SelectZones", "Contrast"))
-        self.pixel_conversion_button.setText(_translate("SelectZones", "Convert to pixels"))
-        self.millimeter_conversion_button.setText(_translate("SelectZones", "Convert to millimeters"))
-        self.micron_conversion_button.setText(_translate("SelectZones", "Convert to microns"))
+        self.conversion_factor_label.setText(_translate("SelectZones", "Conversion factor (pixel per millimeter)\nfactor 100 by default"))
+        self.conversion_factor_button.setText(_translate("SelectZones", "Apply"))
 
     def setupUi(self, SelectZones):
         """
@@ -94,21 +93,6 @@ class Ui_SelectZones(object):
         self.flip_image_button.setObjectName("flip_image_button")
         self.flip_image_button.setEnabled(False)
 
-        self.pixel_conversion_button = QtWidgets.QPushButton(self.centralwidget)
-        self.pixel_conversion_button.setGeometry(QtCore.QRect(1660, 500, 200, 31))
-        self.pixel_conversion_button.setObjectName("pixel_conversion_button")
-        self.pixel_conversion_button.setEnabled(False)
-
-        self.millimeter_conversion_button = QtWidgets.QPushButton(self.centralwidget)
-        self.millimeter_conversion_button.setGeometry(QtCore.QRect(1660, 550, 200, 31))
-        self.millimeter_conversion_button.setObjectName("millimeter_conversion_button")
-        self.millimeter_conversion_button.setEnabled(False)
-
-        self.micron_conversion_button = QtWidgets.QPushButton(self.centralwidget)
-        self.micron_conversion_button.setGeometry(QtCore.QRect(1660, 600, 200, 31))
-        self.micron_conversion_button.setObjectName("micron_conversion_button")
-        self.micron_conversion_button.setEnabled(False)
-
         self.scrollArea = QScrollArea(self.centralwidget)
         self.scrollArea.setGeometry(QtCore.QRect(10, 70, 1861, 391))
         self.scrollArea.setWidgetResizable(True)
@@ -134,6 +118,20 @@ class Ui_SelectZones(object):
         self.contrast_slider.setGeometry(QtCore.QRect(750, 500, 55, 16))
         self.contrast_slider.setObjectName("Contrast slider")
 
+        self.conversion_factor_button = QtWidgets.QPushButton(self.centralwidget)
+        self.conversion_factor_button.setGeometry(QtCore.QRect(1750, 500, 100, 25))
+        self.conversion_factor_button.setObjectName("conversion_factor_button")
+        self.conversion_factor_button.setEnabled(False)
+
+        self.conversion_factor_label = QtWidgets.QLabel(self.centralwidget)
+        self.conversion_factor_label.setGeometry(QtCore.QRect(1325, 495, 250, 40))
+        self.conversion_factor_label.setObjectName("conversion_factor_label")
+
+        self.conversion_factor_line_edit = QtWidgets.QLineEdit(self.centralwidget)
+        self.conversion_factor_line_edit.setGeometry(QtCore.QRect(1575, 500, 150, 25))
+        self.conversion_factor_line_edit.setObjectName("conversion_factor_line_edit")
+        self.conversion_factor_line_edit.setEnabled(False)
+
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider.setGeometry(QtCore.QRect(820, 500, 250, 22))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
@@ -144,7 +142,6 @@ class Ui_SelectZones(object):
         self.horizontalSlider.setTickInterval(1)
         self.horizontalSlider.setSingleStep(10)
         self.horizontalSlider.setPageStep(10)
-        self.horizontalSlider.setTickPosition(QSlider.TicksBelow)
         self.horizontalSlider.setEnabled(False)
 
         self.contrastValueLabel = QtWidgets.QLabel(self.centralwidget)
