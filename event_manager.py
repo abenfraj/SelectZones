@@ -153,6 +153,7 @@ class Event_Manager(QMainWindow):
                 msg.setText("Please close the files that are still open before overwriting them with the new ones.")
                 x = msg.exec_()
             for rectangle in self.ui.rectangles:
+                self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].correctSample()
                 x0 = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditX0.text()) / (
                             1 / self.ui.value_type))
                 xf = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditXF.text()) / (
@@ -162,7 +163,6 @@ class Event_Manager(QMainWindow):
                 yf = int(
                     float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditYF.text()) / (
                                 1 / self.ui.value_type))
-                print(x0, xf, y0, yf)
                 str_iteration = ''
                 path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
                     self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
