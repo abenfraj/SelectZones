@@ -75,7 +75,7 @@ Unlike the contrast feature, you can type fractions or decimal numbers. You then
 To save the data that you are looking for — after displaying the image, making rectangles and everything else you need — you just have to click on the “Save selected zones” button that is positioned on the bottom middle of your window. It will then open a new file dialog in which you will have to choose a directory where a tree of folders will be created containing the exported files. Here is the structure of that tree :
 
 
-> :warning: **If you try to save data of the same image with the same name in the same directory, the old tree of folders will be destroyed.**
+> :warning: **If you try to save data of the same image with the same name in the same directory, the old tree of folders will be destroyed.**<br />
 > :warning: **If you try to save data of the same image you have been working on with the same name in the same directory, make sure the output files are closed before doing so or a warning message will pop up on your screen.**
 
 ## Quit the software

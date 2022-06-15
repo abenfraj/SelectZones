@@ -60,6 +60,7 @@ class Event_Manager(QMainWindow):
                                                   )
         if fileName:
             self.ui.file_name = os.path.basename(fileName).split('.', 1)[0]
+            self.ui.file_name_label.setText("SelectZones - " + self.ui.file_name)
             self.ui.bitmap_label.bitmap_image = Image.open(fileName)
             self.ui.original_image = self.ui.bitmap_label.bitmap_image
             self.ui.bitmap_data = np.array(self.ui.bitmap_label.bitmap_image)
@@ -90,9 +91,9 @@ class Event_Manager(QMainWindow):
                 for rectangle_data in self.ui.previous_rectangles_data:
                     rectangle_data = rectangle_data[rectangle_data.find("(") + 1:rectangle_data.find(")")].split(
                         ", ")
-                    self.ui.rectangles.append(QtCore.QRect(int(rectangle_data[0]), int(rectangle_data[1]),
-                                                           int(rectangle_data[2]) - int(rectangle_data[0]) + 1,
-                                                           int(rectangle_data[3]) - int(rectangle_data[1]) + 1))
+                    qp = QtCore.QPoint(int(rectangle_data[0]), int(rectangle_data[1]))
+                    qs = QtCore.QSize(int(rectangle_data[2]), int(rectangle_data[3]))
+                    self.ui.rectangles.append(QtCore.QRect(qp, qs))
                     self.ui.sample_group_boxes.append(SampleGroupBox(self.ui, len(self.ui.rectangles) - 1))
                     self.ui.sample_group_boxes[-1].setX0()
                     self.ui.sample_group_boxes[-1].setY0()
@@ -154,15 +155,15 @@ class Event_Manager(QMainWindow):
                 x = msg.exec_()
             for rectangle in self.ui.rectangles:
                 self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].correctSample()
-                x0 = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditX0.text()) / (
-                            1 / self.ui.value_type))
-                xf = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditXF.text()) / (
-                            1 / self.ui.value_type))
-                y0 = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditY0.text()) / (
-                            1 / self.ui.value_type))
-                yf = int(
+                x0 = round(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditX0.text()) / (
+                        1 / self.ui.value_type))
+                xf = round(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditXF.text()) / (
+                        1 / self.ui.value_type))
+                y0 = round(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditY0.text()) / (
+                        1 / self.ui.value_type))
+                yf = round(
                     float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditYF.text()) / (
-                                1 / self.ui.value_type))
+                            1 / self.ui.value_type))
                 str_iteration = ''
                 path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
                     self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
@@ -188,7 +189,7 @@ class Event_Manager(QMainWindow):
                     str_iteration = ''
                     for x in range(x0, xf + 1):
                         average_value = 0
-                        for y in range(y0, yf + 1):
+                        for y in range(y0, yf):
                             np_sum = 256 - int(self.ui.bitmap_data[y][x][0]) - 1
                             average_value += np_sum
                         average_value /= (yf - y0)
@@ -287,7 +288,7 @@ class Event_Manager(QMainWindow):
                 self.ui.bitmap_label.onZoomOut()
             with open("_previous_rectangles_data.txt", 'w') as file:
                 for rectangle in self.ui.rectangles:
-                    str_iteration = str(rectangle.getCoords()) + '\n'
+                    str_iteration = str(rectangle.getRect()) + '\n'
                     file.write(str_iteration)
                     file.flush()
             file.close()

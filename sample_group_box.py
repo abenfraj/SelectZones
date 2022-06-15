@@ -150,7 +150,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         x0 = self.rectangle.x()
         try:
             self.lineEditX0.setText("%.3f" % self.roundTo(
-                "%.3f" % (((self.ui.real_width - 1) * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type),
+                "%.3f" % (((self.ui.real_width) * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type),
                 base=1 / self.ui.value_type, prec=3)
                                     )
         except RuntimeError:
@@ -165,7 +165,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         y0 = self.rectangle.y()
         try:
             self.lineEditY0.setText("%.3f" % self.roundTo(
-                "%.3f" % (((self.ui.real_height - 1) * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type),
+                "%.3f" % (((self.ui.real_height) * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type),
                 base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass
@@ -179,7 +179,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         xf = self.rectangle.x() + self.rectangle.width()
         try:
             self.lineEditXF.setText("%.3f" % self.roundTo(
-                "%.3f" % (((self.ui.real_width - 1) * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type),
+                "%.3f" % (((self.ui.real_width) * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type),
                 base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass
@@ -194,7 +194,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         yf = self.rectangle.y() + self.rectangle.height()
         try:
             self.lineEditYF.setText("%.3f" % self.roundTo(
-                "%.3f" % (((self.ui.real_height - 1) * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type),
+                "%.3f" % (((self.ui.real_height) * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type),
                 base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass

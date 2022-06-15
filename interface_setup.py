@@ -17,7 +17,7 @@ class Ui_SelectZones(object):
         """
         This function is used to initialize the interface.
         """
-
+        self.file_name_label = None
         self.contrast_rules_label = None
         self.contrast_apply_button = None
         self.contrastLineEdit = None
@@ -75,9 +75,10 @@ class Ui_SelectZones(object):
         self.conversion_factor_label.setText(
             _translate("SelectZones", "Conversion factor (pixels per millimeter)\nfactor 100 by default"))
         self.conversion_factor_rules_label.setText(
-            "Care to not add any symbol other than '/' when entering the conversion factor as a fraction\nNot even a comma or a dot.")
+            "Care not to add any symbol other than '/' when entering the conversion factor as a fraction\nNot even a comma or a dot.")
         self.conversion_factor_button.setText(_translate("SelectZones", "Apply"))
         self.contrast_apply_button.setText(_translate("SelectZones", "Apply"))
+        self.file_name_label.setText("")
 
     def setupUi(self, SelectZones):
         """
@@ -168,6 +169,10 @@ class Ui_SelectZones(object):
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 480, 670, 361))
         self.groupBox.setObjectName("groupBox")
+
+        self.file_name_label = QtWidgets.QLabel(self.centralwidget)
+        self.file_name_label.setGeometry(QtCore.QRect(1650, 920, 550, 80))
+        self.file_name_label.setObjectName("file_name_label")
 
         self.scrollArea_2 = QtWidgets.QScrollArea(self.groupBox)
         self.scrollArea_2.setFixedWidth(670)
