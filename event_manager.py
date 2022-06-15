@@ -1,6 +1,5 @@
 import os
 import pathlib
-import re
 import shutil
 from os.path import exists
 
@@ -56,7 +55,7 @@ class Event_Manager(QMainWindow):
             self.ui.bitmap_label.bitmap_image.close()
         fileName, _ = QFileDialog.getOpenFileName(self,
                                                   "Open File",
-                                                  "",
+                                                  self.openFilePath(),
                                                   "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
                                                   )
         if fileName:
@@ -75,6 +74,7 @@ class Event_Manager(QMainWindow):
             self.ui.real_width, self.ui.real_height = self.ui.original_image.size
             self.retrieveRectangleData()
             self.enableWidgets()
+            self.saveFilePath(fileName)
 
     def retrieveRectangleData(self):
         """
@@ -84,7 +84,7 @@ class Event_Manager(QMainWindow):
         """
 
         file_exists = exists("_previous_rectangles_data.txt")
-        if file_exists:
+        if file_exists and len(self.ui.rectangles) == 0:
             with open("_previous_rectangles_data.txt", "r") as f:
                 self.ui.previous_rectangles_data = f.readlines()
                 for rectangle_data in self.ui.previous_rectangles_data:
@@ -110,15 +110,15 @@ class Event_Manager(QMainWindow):
             self.ui.flip_image_button.setEnabled(True)
             self.ui.flip_image_button.clicked.connect(self.flipImage)
             self.ui.image_is_displayed = True
-            self.ui.horizontalSlider.setEnabled(True)
-            self.ui.horizontalSlider.valueChanged.connect(self.setContrast)
-            self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))
+            self.ui.contrastLineEdit.setEnabled(True)
+            self.ui.contrast_apply_button.setEnabled(True)
+            self.ui.contrast_apply_button.clicked.connect(self.setContrast)
             self.ui.conversion_factor_button.setEnabled(True)
             self.ui.conversion_factor_button.clicked.connect(self.setConversionFactor)
             self.ui.conversion_factor_line_edit.setEnabled(True)
-            self.ui.conversion_factor_line_edit.textChanged.connect(self.setConversionFactor)
             self.ui.conversion_factor_line_edit.setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+[,.]?[0-9]*([\/][0-9]+[,.]?[0-9]*)*\/?")))
+            self.ui.sp_to_ip_value_label.setText(self.ui.bitmap_label.calculateSPToIPValue())
 
     def saveBmpData(self):
         """
@@ -128,8 +128,18 @@ class Event_Manager(QMainWindow):
         :except FileNotFoundError
         :return: None
         """
-
-        directoryName = QFileDialog.getExistingDirectory(self, 'Select a directory')
+        if len(self.ui.rectangles) == 0:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("No rectangle drawn")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setText("There are no drawn rectangle to save any data.")
+            x = msg.exec_()
+            button = msg.clickedButton()
+            sb = msg.standardButton(button)
+            if sb == QMessageBox.Ok:
+                return
+        directoryName = QFileDialog.getExistingDirectory(self, 'Select a directory', self.openFilePath())
         if directoryName:
             path = directoryName + "/" + self.ui.file_name
             pathlib.Path(path).mkdir(parents=True, exist_ok=True)
@@ -143,11 +153,16 @@ class Event_Manager(QMainWindow):
                 msg.setText("Please close the files that are still open before overwriting them with the new ones.")
                 x = msg.exec_()
             for rectangle in self.ui.rectangles:
-                x0 = int(self.ui.real_width * rectangle.x() / self.ui.bitmap_label.size().width())
-                xf = int(self.ui.real_width * (rectangle.x() + rectangle.width()) / self.ui.bitmap_label.size().width())
-                y0 = int(self.ui.real_height * rectangle.y() / self.ui.bitmap_label.size().height())
+                x0 = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditX0.text()) / (
+                            1 / self.ui.value_type))
+                xf = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditXF.text()) / (
+                            1 / self.ui.value_type))
+                y0 = int(float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditY0.text()) / (
+                            1 / self.ui.value_type))
                 yf = int(
-                    self.ui.real_height * (rectangle.y() + rectangle.height()) / self.ui.bitmap_label.size().height())
+                    float(self.ui.sample_group_boxes[self.ui.rectangles.index(rectangle)].lineEditYF.text()) / (
+                                1 / self.ui.value_type))
+                print(x0, xf, y0, yf)
                 str_iteration = ''
                 path = directoryName + "/" + self.ui.file_name + "/" + "SP" + str(
                     self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name
@@ -163,7 +178,7 @@ class Event_Manager(QMainWindow):
                                  self.ui.sample_group_boxes[
                                      self.ui.rectangles.index(
                                          rectangle)].lineEditYF.text() + ") => (X0, Y0, XF, YF)" + "\n"
-                str_iteration += "Conversion factor in pixel per millimeter = " + str(
+                str_iteration += "Conversion factor in pixels per millimeter = " + str(
                     self.ui.value_type) + " (default value is 100)\n\n\n"
                 str_iteration += 'X Value \tAverage Y Value\n\n'
                 with open(path + "/" + "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + ".txt",
@@ -171,12 +186,11 @@ class Event_Manager(QMainWindow):
                     file.write(str_iteration)
                     file.flush()
                     str_iteration = ''
-                    for x in range(x0, xf):
+                    for x in range(x0, xf + 1):
                         average_value = 0
-                        for y in range(y0, yf):
+                        for y in range(y0, yf + 1):
                             np_sum = 256 - int(self.ui.bitmap_data[y][x][0]) - 1
                             average_value += np_sum
-                            print(np_sum, average_value)
                         average_value /= (yf - y0)
                         str_iteration += str("{:.3f}".format(x / self.ui.value_type)) + "\t\t" + str(
                             int(average_value)) + '\n'
@@ -210,8 +224,9 @@ class Event_Manager(QMainWindow):
             x = self.ui.real_width * pos.x() / self.ui.bitmap_label.size().width()
             y = self.ui.real_height * pos.y() / self.ui.bitmap_label.size().height()
             self.ui.mousetracker_label.setText(
-                "x: " + "%.3f" % (x / self.ui.value_type) + ", y: " + "%.3f" % (
-                        y / self.ui.value_type) + ", value: %d" % (
+                "x: " + "%.3f" % self.roundTo(x / self.ui.value_type, base=1 / self.ui.value_type,
+                                              prec=3) + ", y: " + "%.3f" % self.roundTo(
+                    y / self.ui.value_type, base=1 / self.ui.value_type, prec=3) + ", value: %d" % (
                         256 - self.ui.bitmap_data[int(y)][int(x)][0] - 1))
         except IndexError:
             pass
@@ -219,6 +234,10 @@ class Event_Manager(QMainWindow):
             pass
         except AttributeError:
             pass
+
+    @staticmethod
+    def roundTo(x, prec, base):
+        return round(base * round(float(x) / base), prec)
 
     def flipImage(self):
         """
@@ -243,8 +262,9 @@ class Event_Manager(QMainWindow):
 
         :return: None
         """
-        self.ui.contrastValueLabel.setText(str(self.ui.horizontalSlider.value()))
-        contrast_value = self.ui.horizontalSlider.value()
+        if self.ui.contrastLineEdit.text() == "":
+            return
+        contrast_value = int(self.ui.contrastLineEdit.text())
         contrast = ImageEnhance.Contrast(self.ui.bitmap_label.bitmap_image)
         modified_contrast_image = contrast.enhance((contrast_value - 50) / 25. + 0.5)
         modified_contrast_image.resize(
@@ -286,6 +306,8 @@ class Event_Manager(QMainWindow):
                 self.ui.value_type = float(self.ui.conversion_factor_line_edit.text())
             except ValueError:
                 pass
+        for sample_group_box in self.ui.sample_group_boxes:
+            sample_group_box.updateLineEdits()
 
     @staticmethod
     def convertToFloat(frac_str):
@@ -305,3 +327,18 @@ class Event_Manager(QMainWindow):
     def isFractionValid(string):
         values = string.split('/')
         return len(values) == 2 and all(i.isdigit() for i in values)
+
+    @staticmethod
+    def saveFilePath(filePath):
+        path = filePath.rsplit("/", 1)[0]
+        with open("_file_path.txt", 'w') as file:
+            file.write(path)
+            file.flush()
+            file.close()
+
+    def openFilePath(self) -> str:
+        file_exists = exists("_file_path.txt")
+        if file_exists:
+            with open("_file_path.txt", "r") as f:
+                self.ui.file_path = f.readline()
+                return self.ui.file_path

@@ -120,7 +120,6 @@ class BitmapLabel(QLabel):
         :param e_pos: The position of the cursor.
         :return: The side of the rectangle the cursor is on.
         """
-
         if not self.beginning.isNull() and not self.end.isNull():
             x1, x2 = sorted([self.beginning.x(), self.end.x()])
             y1, y2 = sorted([self.beginning.y(), self.end.y()])
@@ -174,10 +173,15 @@ class BitmapLabel(QLabel):
         if self.bitmap_image is not None:  # If the image is not None
             self.applyEvent(event)  # Apply the event
             self.state = FREE_STATE  # Set the state to free state
-            self.sample_group_boxes[-1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
-            self.sample_group_boxes[-1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
-            self.sample_group_boxes[-1].setXF()  # Set the xF of the last sample group box to the x coordinate of the end point
-            self.sample_group_boxes[-1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
+            self.checkAndSwapCoordinates()
+            self.sample_group_boxes[
+                -1].setX0()  # Set the x0 of the last sample group box to the x coordinate of the beginning point
+            self.sample_group_boxes[
+                -1].setY0()  # Set the y0 of the last sample group box to the y coordinate of the beginning point
+            self.sample_group_boxes[
+                -1].setXF()  # Set the xF of the last sample group box to the x coordinate of the end point
+            self.sample_group_boxes[
+                -1].setYF()  # Set the yF of the last sample group box to the y coordinate of the end point
             self.checkRectangleInImage(self.rectangles[-1])  # Check if the rectangle is out of bounds
             super().mouseReleaseEvent(event)  # Call the parent class's mouseReleaseEvent method
 
@@ -260,6 +264,7 @@ class BitmapLabel(QLabel):
             else:
                 if self.bitmap_image is not None:
                     self.onZoomOut()
+            self.ui.sp_to_ip_value_label.setText(self.calculateSPToIPValue())
 
     def onZoomIn(self):
         """
@@ -272,15 +277,16 @@ class BitmapLabel(QLabel):
         if self.scale < 15:
             self.scale *= 2
             self.resizeImage()
-            qp = None
-            qs = None
+            qp = QPoint()
+            qs = QPoint()
             for rectangle in self.rectangles:
                 qp = QPoint(int(rectangle.x() * 2), int(rectangle.y() * 2))
                 qs = QSize(int(rectangle.width() * 2), int(rectangle.height() * 2))
                 rectangle.moveTo(qp)
                 rectangle.setSize(qs)
-            self.beginning = qp
-            self.end = QPoint(qp.x() + qs.width(), qp.y() + qs.height())
+            if len(self.rectangles) > 0:
+                self.beginning = qp
+                self.end = QPoint(qp.x() + qs.width(), qp.y() + qs.height())
 
     def onZoomOut(self):
         """
@@ -291,15 +297,16 @@ class BitmapLabel(QLabel):
         """
 
         if self.scale > 1:
-            qp = None
-            qs = None
+            qp = QPoint()
+            qs = QPoint()
             for rectangle in self.rectangles:
                 qp = QPoint(int(rectangle.x() / 2), int(rectangle.y() / 2))
                 qs = QSize(int(rectangle.width() / 2), int(rectangle.height() / 2))
                 rectangle.moveTo(qp)
                 rectangle.setSize(qs)
-            self.beginning = qp
-            self.end = QPoint(qp.x() + qs.width(), qp.y() + qs.height())
+            if len(self.rectangles) > 0:
+                self.beginning = qp
+                self.end = QPoint(qp.x() + qs.width(), qp.y() + qs.height())
             self.scale /= 2
             self.resizeImage()
 
@@ -313,6 +320,7 @@ class BitmapLabel(QLabel):
         size = self.pixmap.size()
         scaled_pixmap = self.pixmap.scaled(self.scale * size)
         self.setPixmap(scaled_pixmap)
+        self.update()
 
     def setBeginning(self, beginning):
         """
@@ -341,46 +349,57 @@ class BitmapLabel(QLabel):
         :param rectangle: The rectangle to check.
         :return: None
         """
-
         if rectangle.x() + rectangle.width() > self.size().width():
             rectangle.setRight(self.ui.bitmap_label.width() - 1)
             self.sample_group_boxes[-1].updateRectangle(rectangle)
-            self.sample_group_boxes[-1].setXFToBottomRight()
+            self.sample_group_boxes[-1].updateLineEdits()
             self.end = QPoint(rectangle.right(), self.end.y())
         if rectangle.y() + rectangle.height() > self.size().height():
             rectangle.setBottom(self.ui.bitmap_label.height() - 1)
             self.sample_group_boxes[-1].updateRectangle(rectangle)
-            self.sample_group_boxes[-1].setYFToBottomRight()
+            self.sample_group_boxes[-1].updateLineEdits()
             self.end = QPoint(self.end.x(), rectangle.bottom())
-        if rectangle.x() + rectangle.width() < 0:
-            rectangle.setRight(0)
+        if rectangle.x() < 0:
+            rectangle.setX(0)
             self.sample_group_boxes[-1].updateRectangle(rectangle)
-            self.sample_group_boxes[-1].setXFToTopLeft()
+            self.sample_group_boxes[-1].updateLineEdits()
             self.end = QPoint(rectangle.right(), self.end.y())
-        if rectangle.y() + rectangle.height() < 0:
-            rectangle.setBottom(0)
+        if rectangle.y() < 0:
+            rectangle.setY(0)
             self.sample_group_boxes[-1].updateRectangle(rectangle)
-            self.sample_group_boxes[-1].setYFToTopLeft()
+            self.sample_group_boxes[-1].updateLineEdits()
             self.end = QPoint(self.end.x(), rectangle.bottom())
 
-    def swapY0YF(self):
+    def checkAndSwapCoordinates(self):
         """
-        This method swaps the Y0 and YF values of the rectangle.
+        This method swaps the Y0 and YF / X0 and XF values of the rectangle.
 
         :return: None
         """
-        if self.sample_group_boxes[-1].getY0() > self.sample_group_boxes[-1].getYF():
-            tmpYF = self.sample_group_boxes[-1].getYF()
-            self.sample_group_boxes[-1].setYF(self.sample_group_boxes[-1].getY0())
-            self.sample_group_boxes[-1].setY0(tmpYF)
+        y0 = self.rectangles[-1].y()
+        yf = self.rectangles[-1].y() + self.rectangles[-1].height()
+        x0 = self.rectangles[-1].x()
+        xf = self.rectangles[-1].x() + self.rectangles[-1].width()
+        if y0 > yf:
+            oldY = self.rectangles[-1].y()
+            oldHeight = self.rectangles[-1].height()
+            self.rectangles[-1].setY(oldY + oldHeight)
+            self.rectangles[-1].setHeight(-oldHeight)
+            self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
+        if x0 > xf:
+            oldX = self.rectangles[-1].x()
+            oldWidth = self.rectangles[-1].width()
+            self.rectangles[-1].setX(oldX + oldWidth)
+            self.rectangles[-1].setWidth(-oldWidth)
+            self.sample_group_boxes[-1].updateRectangle(self.rectangles[-1])
 
-    def swapX0XF(self):
+    def calculateSPToIPValue(self) -> str:
         """
-        This method swaps the X0 and XF values of the rectangle.
+        This function is used to calculate the Image Pixel value from the Screen Pixel value.
 
         :return: None
         """
-        if self.sample_group_boxes[-1].getX0() > self.sample_group_boxes[-1].getXF():
-            tmpXF = self.sample_group_boxes[-1].getXF()
-            self.sample_group_boxes[-1].setXF(self.sample_group_boxes[-1].getX0())
-            self.sample_group_boxes[-1].setX0(tmpXF)
+
+        x_val = round((self.ui.real_width / (self.pixmap.size().width() * self.scale)) / self.ui.value_type, 3)
+        y_val = round((self.ui.real_height / (self.pixmap.size().height() * self.scale)) / self.ui.value_type, 3)
+        return "Image pixel / Screen pixel : X = " + str(x_val) + ", Y = " + str(y_val)

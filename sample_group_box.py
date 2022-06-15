@@ -1,3 +1,5 @@
+import os
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QIcon
@@ -18,6 +20,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         """
 
         super(SampleGroupBox, self).__init__()
+        self.correctButton = None
         self.grid = None
         self.sample_name = None
         self.groupBox = None
@@ -62,9 +65,18 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.lineEditYF = QtWidgets.QLineEdit(self.groupBox)
 
         self.removeButton = QtWidgets.QPushButton(self.groupBox)
-        self.removeButton.setIcon(QIcon("Red-Close-Button-Transparent.png"))
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'Red-Close-Button-Transparent.png')
+        self.removeButton.setIcon(QIcon(filename))
         self.removeButton.setIconSize(QtCore.QSize(20, 20))
         self.removeButton.clicked.connect(self.removeSample)
+
+        self.correctButton = QtWidgets.QPushButton(self.groupBox)
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'Correct-Button.png')
+        self.correctButton.setIcon(QIcon(filename))
+        self.correctButton.setIconSize(QtCore.QSize(20, 20))
+        self.correctButton.clicked.connect(self.correctSample)
 
         lay = QtWidgets.QVBoxLayout(self)
         box = QtWidgets.QGroupBox()
@@ -86,22 +98,22 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         self.lineEditX0.setGeometry(QtCore.QRect(150, 20, 61, 22))
         self.lineEditX0.setObjectName("lineEditX0" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditX0.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"^[+-]?((\d+(\.\d+)?)|(\.\d+))$")))
         self.lineEditX0.textEdited[str].connect(self.onX0Changed)
 
         self.lineEditY0.setGeometry(QtCore.QRect(250, 20, 61, 22))
         self.lineEditY0.setObjectName("lineEditY0" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditY0.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"^[+-]?((\d+(\.\d+)?)|(\.\d+))$")))
         self.lineEditY0.textEdited[str].connect(self.onY0Changed)
 
         self.lineEditXF.setGeometry(QtCore.QRect(390, 20, 61, 22))
         self.lineEditXF.setObjectName("lineEditXF" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditXF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"^[+-]?((\d+(\.\d+)?)|(\.\d+))$")))
         self.lineEditXF.textEdited[str].connect(self.onXFChanged)
 
         self.lineEditYF.setGeometry(QtCore.QRect(480, 20, 61, 22))
         self.lineEditYF.setObjectName("lineEditYF" + str(self.sample_number))
-        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"[0-9]+\.?[0-9]*|\.[0-9]+")))
+        self.lineEditYF.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r"^[+-]?((\d+(\.\d+)?)|(\.\d+))$")))
         self.lineEditYF.textEdited[str].connect(self.onYFChanged)
 
         self.sample_name.setText("Sample " + str(self.sample_number + 1) + ":  ")
@@ -121,6 +133,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.grid.addWidget(self.labelYF, 0, 7)
         self.grid.addWidget(self.lineEditYF, 0, 8)
         self.grid.addWidget(self.removeButton, 0, 9)
+        self.grid.addWidget(self.correctButton, 0, 10)
 
         box.setLayout(self.grid)
         box.setFixedSize(609, 59)
@@ -136,8 +149,10 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         x0 = self.rectangle.x()
         try:
-            self.lineEditX0.setText(
-                "%.3f" % ((self.ui.real_width * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+            self.lineEditX0.setText("%.3f" % self.roundTo(
+                "%.3f" % (((self.ui.real_width - 1) * x0 / self.ui.bitmap_label.size().width()) / self.ui.value_type),
+                base=1 / self.ui.value_type, prec=3)
+                                    )
         except RuntimeError:
             pass
 
@@ -149,8 +164,9 @@ class SampleGroupBox(QtWidgets.QWidget):
         """
         y0 = self.rectangle.y()
         try:
-            self.lineEditY0.setText(
-                "%.3f" % ((self.ui.real_height * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+            self.lineEditY0.setText("%.3f" % self.roundTo(
+                "%.3f" % (((self.ui.real_height - 1) * y0 / self.ui.bitmap_label.size().height()) / self.ui.value_type),
+                base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass
 
@@ -162,8 +178,9 @@ class SampleGroupBox(QtWidgets.QWidget):
         """
         xf = self.rectangle.x() + self.rectangle.width()
         try:
-            self.lineEditXF.setText(
-                "%.3f" % ((self.ui.real_width * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type))
+            self.lineEditXF.setText("%.3f" % self.roundTo(
+                "%.3f" % (((self.ui.real_width - 1) * xf / self.ui.bitmap_label.size().width()) / self.ui.value_type),
+                base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass
 
@@ -176,10 +193,15 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         yf = self.rectangle.y() + self.rectangle.height()
         try:
-            self.lineEditYF.setText(
-                "%.3f" % ((self.ui.real_height * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type))
+            self.lineEditYF.setText("%.3f" % self.roundTo(
+                "%.3f" % (((self.ui.real_height - 1) * yf / self.ui.bitmap_label.size().height()) / self.ui.value_type),
+                base=1 / self.ui.value_type, prec=3))
         except RuntimeError:
             pass
+
+    @staticmethod
+    def roundTo(x, prec, base):
+        return round(base * round(float(x) / base), prec)
 
     def onX0Changed(self, text):
         """
@@ -190,8 +212,10 @@ class SampleGroupBox(QtWidgets.QWidget):
         """
 
         try:
+            # rounded_value = str(self.roundTo(text, base=1 / self.ui.value_type, prec=3))
+            # self.lineEditX0.setText(rounded_value)
             self.rectangle.setX(
-                int(self.ui.bitmap_label.size().width() * (int(text) * self.ui.value_type) / self.ui.real_width))
+                int(self.ui.bitmap_label.size().width() * (float(text) * self.ui.value_type) / self.ui.real_width))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
         except ValueError:
@@ -209,7 +233,7 @@ class SampleGroupBox(QtWidgets.QWidget):
 
         try:
             self.rectangle.setY(
-                int(self.ui.bitmap_label.size().height() * (int(text) * self.ui.value_type) / self.ui.real_height))
+                int(self.ui.bitmap_label.size().height() * (float(text) * self.ui.value_type) / self.ui.real_height))
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setBeginning(QPoint(self.rectangle.x(), self.rectangle.y()))
             self.ui.bitmap_label.update()
@@ -227,7 +251,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         try:
             self.rectangle.setWidth(
                 int(self.ui.bitmap_label.size().width() * (
-                        int(text) * self.ui.value_type) / self.ui.real_width) - self.rectangle.x())
+                        float(text) * self.ui.value_type) / self.ui.real_width) - self.rectangle.x())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -246,7 +270,7 @@ class SampleGroupBox(QtWidgets.QWidget):
         try:
             self.rectangle.setHeight(
                 int(self.ui.bitmap_label.size().height() * (
-                        int(text) * self.ui.value_type) / self.ui.real_height) - self.rectangle.y())
+                        float(text) * self.ui.value_type) / self.ui.real_height) - self.rectangle.y())
             if self.rectangle == self.ui.rectangles[-1]:
                 self.ui.bitmap_label.setEnd(
                     QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
@@ -296,50 +320,84 @@ class SampleGroupBox(QtWidgets.QWidget):
         self.ui.bitmap_label.setBeginning(new_beginning)
         self.ui.bitmap_label.setEnd(new_end)
 
-    def setXFToTopLeft(self):
+    def correctSample(self):
         """
-        This function is used to set the xf value to (0, 0).
+        This function is used to correct the values of the sample.
 
         :return: None
         """
 
+        self.correctX0()
+        self.correctY0()
+        self.correctXF()
+        self.correctYF()
+
+    def correctX0(self):
+        """
+        This function is used to correct the x0 value of the sample.
+
+        :return: None
+        """
+        x0 = self.rectangle.x()
         try:
-            self.lineEditXF.setText("%.3f" % 0)
+            rounded_value = self.roundTo(self.lineEditX0.text(), base=1 / self.ui.value_type, prec=3)
+            self.lineEditX0.setText("%.3f" % self.roundTo(
+                "%.3f" % rounded_value,
+                base=(1 / self.ui.value_type),
+                prec=3))
         except RuntimeError:
             pass
 
-    def setYFToTopLeft(self):
+    def correctY0(self):
         """
-        This function is used to set the yf value to (0, 0).
+        This function is used to correct the x0 value of the sample.
 
         :return: None
         """
-
+        y0 = self.rectangle.y()
         try:
-            self.lineEditYF.setText("%.3f" % 0)
+            rounded_value = self.roundTo(self.lineEditY0.text(), base=1 / self.ui.value_type, prec=3)
+            self.lineEditY0.setText("%.3f" % self.roundTo(
+                "%.3f" % rounded_value,
+                base=1 / self.ui.value_type, prec=3)
+                                    )
         except RuntimeError:
             pass
 
-    def setXFToBottomRight(self):
+    def correctXF(self):
         """
-        This function is used to set the xf value of the sample.
+        This function is used to correct the x0 value of the sample.
 
         :return: None
         """
-
         try:
-            self.lineEditXF.setText("%.3f" % ((self.ui.real_width - 1) / self.ui.value_type))
-        except RuntimeError:
+            rounded_value = str("%.3f" % self.roundTo(self.lineEditXF.text(), base=1 / self.ui.value_type, prec=3))
+            self.lineEditXF.setText(rounded_value)
+            self.rectangle.setWidth(
+                int(self.ui.bitmap_label.size().width() * (
+                        float(self.lineEditXF.text()) * self.ui.value_type) / self.ui.real_width) - self.rectangle.x())
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setEnd(
+                    QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
+            self.ui.bitmap_label.update()
+        except ValueError:
             pass
 
-    def setYFToBottomRight(self):
+    def correctYF(self):
         """
-        This function is used to set the yf value of the sample.
+        This function is used to correct the x0 value of the sample.
 
         :return: None
         """
-
         try:
-            self.lineEditYF.setText("%.3f" % ((self.ui.real_height - 1) / self.ui.value_type))
-        except RuntimeError:
+            rounded_value = str("%.3f" % self.roundTo(self.lineEditYF.text(), base=1 / self.ui.value_type, prec=3))
+            self.lineEditYF.setText(rounded_value)
+            self.rectangle.setHeight(
+                int(self.ui.bitmap_label.size().height() * (
+                        float(self.lineEditYF.text()) * self.ui.value_type) / self.ui.real_height) - self.rectangle.y())
+            if self.rectangle == self.ui.rectangles[-1]:
+                self.ui.bitmap_label.setEnd(
+                    QPoint(self.rectangle.x() + self.rectangle.width(), self.rectangle.y() + self.rectangle.height()))
+            self.ui.bitmap_label.update()
+        except ValueError:
             pass
