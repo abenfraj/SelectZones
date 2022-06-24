@@ -53,7 +53,7 @@ You can only adjust with your mouse the last rectangle you drew, not the ones be
 
 Simply select the line edit you want to modify in the sample group box and type your coordinates in millimeters. The rectangle adjusts dynamically when the values are changed. You aren’t able to type any character other than numbers and one single dot. 
 
-> :warning: **If you make the X0 and Y0 values greater than XF and YF values, the program might bug out and leave the output file empty. The same should happen if you make the XF and YF values lesser than X0 and Y0.**__
+> :warning: **If you make the X0 and Y0 values greater than XF and YF values, the program might bug out and leave the output file empty. The same should happen if you make the XF and YF values lesser than X0 and Y0.**/
 > :warning: **If you type coordinates that don’t match the limits of the image, the rectangle will go out of the label and won’t be automatically pushed back inside, which will lead to a crash or the generation of an empty output file.**
 
 ## Delete a rectangle
@@ -79,7 +79,7 @@ To save the data that you are looking for — after displaying the image, making
 ![image](https://user-images.githubusercontent.com/72936702/175545769-10703688-4b43-4280-9cd6-c2e5cccdc003.png)
 
 
-> :warning: **If you try to save data of the same image with the same name in the same directory, the old tree of folders will be destroyed.**__
+> :warning: **If you try to save data of the same image with the same name in the same directory, the old tree of folders will be destroyed.**/
 > :warning: **If you try to save data of the same image you have been working on with the same name in the same directory, make sure the output files are closed before doing so or a warning message will pop up on your screen.**
 
 ## Quit the software
