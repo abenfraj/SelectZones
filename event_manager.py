@@ -17,27 +17,27 @@ Image.MAX_IMAGE_PIXELS = None
 
 class Event_Manager(QMainWindow):
     """
-    This class is used to manage some events applied on widgets of the main window and more
+    This class is used to manage some events applied on widgets of the main window. It connects some widgets to their
+    corresponding functions, retrieves some data from the last usage of the program and enables some widgets after the
+    image is loaded.
     """
-
     def __init__(self, ui):
         """
-        This function is used to initialize the class
+        This function is used to initialize the class.
 
         :param ui: The main window's UI object
+        :return: None
         """
-
         super(Event_Manager, self).__init__()
         self.ui = ui
         self.connectAllWidgets()
 
     def connectAllWidgets(self):
         """
-        This function is used to connect all the widgets of the main window to their corresponding functions
+        This function is used to connect all the widgets of the main window to their corresponding functions.
 
         :return: None
         """
-
         self.ui.select_bitmap_button.clicked.connect(self.openFileDialog)
         self.ui.quit_button.clicked.connect(self.quitApp)
         self.ui.save_bmp_data_button.clicked.connect(self.saveBmpData)
@@ -45,18 +45,20 @@ class Event_Manager(QMainWindow):
 
     def openFileDialog(self):
         """
-            This function is used to open the file dialog and select an image to display in the label.
-            It will then call the functions to retrieve the rectangle data and enable the widgets.
+        This function is used to open the file dialog and select an image to display in the label. You are only able to
+        choose a bitmap file (*.bmp). When the image is chosen, a label will display its name in the bottom right corner
+        of the window. The data of the image is stored in the bitmap_data variable. The image is also resized to fit the
+        label. Only then, the image is displayed in the label with the last drawn rectangles from the previous session
+        and the widgets are enabled. The path of the chosen image is also saved with the saveFilePath function.
 
-            :return: None
+        :return: None
         """
-
         if self.ui.bitmap_label.bitmap_image is not None:
             self.ui.bitmap_label.bitmap_image.close()
         fileName, _ = QFileDialog.getOpenFileName(self,
                                                   "Open File",
                                                   self.openFilePath(),
-                                                  "BMP files (*.bmp);;PNG files (*.png);;All Files (*)",
+                                                  "BMP files (*.bmp)",
                                                   )
         if fileName:
             self.ui.file_name = os.path.basename(fileName).split('.', 1)[0]
@@ -79,11 +81,11 @@ class Event_Manager(QMainWindow):
 
     def retrieveRectangleData(self):
         """
-        This function is used to retrieve the rectangle data and store it in the sample group boxes.
+        This function is used to retrieve the rectangle data from the "_previous_rectangles_data.txt" file and store it
+        in the sample group boxes. It automatically displays them in the label.
 
         :return: None
         """
-
         file_exists = exists("_previous_rectangles_data.txt")
         if file_exists and len(self.ui.rectangles) == 0:
             with open("_previous_rectangles_data.txt", "r") as f:
@@ -102,11 +104,10 @@ class Event_Manager(QMainWindow):
 
     def enableWidgets(self):
         """
-        This function is used to enable the widgets of the main window. This is called when an image is loaded.
+        This function is used to enable some widgets of the main window. This is mainly called when an image is loaded.
 
         :return: None
         """
-
         if self.ui.image_is_displayed is False:
             self.ui.flip_image_button.setEnabled(True)
             self.ui.flip_image_button.clicked.connect(self.flipImage)
@@ -123,8 +124,16 @@ class Event_Manager(QMainWindow):
 
     def saveBmpData(self):
         """
-        This function is used to save the bitmap data in a defined format.
-        That format consists in a tree of directories and files.
+        This function is used to save the bitmap data in a defined format. That format consists in a tree of directories
+        and files. It allows you to select a directory in which the tree will be created. If the directory already
+        exists, it will be overwritten. The tree will contain the following directories and files:
+            - a directory named after the image.
+            - a set of directories each associated with a corresponding number and the file name.
+            - a cropped image corresponding to the associated rectangle in its directory.
+            - an output file in its directory.
+        Rectangles must be drawn on the label to use this feature successfully. If not, a message will pop up and tell
+        the user to do so. You also have to close all the old output files before using this feature. A message will pop
+        up if you try to save the data while the output file is still open.
 
         :except FileNotFoundError
         :return: None
@@ -170,7 +179,7 @@ class Event_Manager(QMainWindow):
                 pathlib.Path(path).mkdir(parents=True, exist_ok=True)
                 str_iteration += "HEADER\n\n"
                 str_iteration += "SP" + str(self.ui.rectangles.index(rectangle) + 1) + self.ui.file_name + '\n'
-                str_iteration += 'FLIPPED = ' + str(self.ui.flipped) + '\n'
+                str_iteration += "FLIPPED = " + str(self.ui.flipped) + '\n'
                 str_iteration += "(" + self.ui.sample_group_boxes[
                     self.ui.rectangles.index(rectangle)].lineEditX0.text() + ", " + self.ui.sample_group_boxes[
                                      self.ui.rectangles.index(rectangle)].lineEditY0.text() + ", " + \
@@ -215,8 +224,9 @@ class Event_Manager(QMainWindow):
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_positionChanged(self, pos):
         """
-        This function is called everytime the mouse is moved.
-        It updates the position of the mouse in the main window and displays it on top of the label.
+        This function is called everytime the mouse is moved. It updates the position of the mouse in the main window
+        and displays it on top of the label. The value displayed is the value of the pixel at the position of the mouse
+        in millimeters. It depends on the value_type variable.
 
         :param pos: The position of the mouse cursor.
         :return: None
@@ -238,15 +248,23 @@ class Event_Manager(QMainWindow):
 
     @staticmethod
     def roundTo(x, prec, base):
+        """
+        This function rounds a number to a certain precision.
+
+        :param x: The number to be rounded.
+        :param prec: The precision of the number (meaning the number of digits after the decimal point).
+        :param base: The base of the number. The step between each value.
+        :return: The rounded number.
+        """
         return round(base * round(float(x) / base), prec)
 
     def flipImage(self):
         """
-        This function is used to flip the image from left to right.
+        This function is used to laterally flip the image from left to right. It is called when the user clicks on the
+        flip button. It doesn't flip the rectangles.
 
         :return: None
         """
-
         # TODO : DeprecationWarning: FLIP_LEFT_RIGHT is deprecated and will be removed in Pillow 10 (2023-07-01). Use Transpose.FLIP_LEFT_RIGHT instead
         self.ui.bitmap_data = self.ui.bitmap_data[::-1]
         self.ui.bitmap_label.bitmap_image = self.ui.bitmap_label.bitmap_image.transpose(
@@ -259,7 +277,10 @@ class Event_Manager(QMainWindow):
 
     def setContrast(self):
         """
-        This function is used to set the contrast of the image with the slider.
+        This function is used to set the contrast of the image with the slider. It is called when the user enters a
+        numeric value in it's associated lineEdit. If the value is below 60, the image's colors will be reversed. If the
+        value is above 60, the image's colors will be darker. The way Image.Contrast() works is that, depending on the
+        value you input, it will thicken the pixels that are darker or lighter.
 
         :return: None
         """
@@ -279,7 +300,7 @@ class Event_Manager(QMainWindow):
     def quitApp(self):
         """
         This function is used to quit the application. Either with the quit button or the red cross.
-        It writes down the rectangles' coordinates in the corresponding file.
+        It writes down the rectangles' coordinates in the "_previous_rectangles_data.txt" file.
 
         :return: None
         """
@@ -296,7 +317,8 @@ class Event_Manager(QMainWindow):
 
     def setConversionFactor(self):
         """
-        This function is used to set the conversion factor that is entered in the line edit.
+        This function is used to set the conversion factor that is entered in its line edit. It updates the value of
+        each sample box and the mouse tracker
 
         :return: None
         """
@@ -312,6 +334,12 @@ class Event_Manager(QMainWindow):
 
     @staticmethod
     def convertToFloat(frac_str):
+        """
+        This function is used to convert a string to a float.
+
+        :param frac_str: The string to be converted.
+        :return: The float value of the string.
+        """
         try:
             return float(frac_str)
         except ValueError:
@@ -326,11 +354,23 @@ class Event_Manager(QMainWindow):
 
     @staticmethod
     def isFractionValid(string):
+        """
+        This function is used to check if a string is a valid fraction. This only works with round numbers.
+
+        :param string: The string to be checked.
+        :return: True if the string is a valid fraction, False otherwise.
+        """
         values = string.split('/')
         return len(values) == 2 and all(i.isdigit() for i in values)
 
     @staticmethod
     def saveFilePath(filePath):
+        """
+        This function is used to save the file path of the chosen file in the "_file_path.txt" file.
+
+        :param filePath: The file path of the chosen file.
+        :return: None
+        """
         path = filePath.rsplit("/", 1)[0]
         with open("_file_path.txt", 'w') as file:
             file.write(path)
@@ -338,6 +378,11 @@ class Event_Manager(QMainWindow):
             file.close()
 
     def openFilePath(self) -> str:
+        """
+        This function is used to open and read the file path of the previously chosen file in the "_file_path.txt" file.
+
+        :return: The file path of the previously chosen file.
+        """
         file_exists = exists("_file_path.txt")
         if file_exists:
             with open("_file_path.txt", "r") as f:

@@ -20,7 +20,8 @@ CURSOR_ON_BOTTOM_SIDE = 4
 
 class BitmapLabel(QLabel):
     """
-    This class is used to draw a bitmap label.
+    This class is used to add features to the QLabel widget that is implemented in PyQt5 by default. It allows the user
+    to draw rectangles on the label, adjust them with the mouse, zoom in and out.
     """
 
     def __init__(self, ui):
@@ -65,7 +66,8 @@ class BitmapLabel(QLabel):
     def paintEvent(self, event):
         """
         This method makes the rectangle that is drawn by the mouse. The color changes after each drawn rectangle.
-        It also draws the editing dashed lines on the sides of the last drawn rectangle.
+        It also draws the editing dashed lines on the sides of the last drawn rectangle. It also checks if the mouse is
+        on a side of the rectangle.
 
         :param event: The paint event.
         :return: None.
@@ -115,7 +117,8 @@ class BitmapLabel(QLabel):
 
     def cursorOnSide(self, e_pos) -> int:
         """
-        This method checks if the cursor is on a side of the rectangle.
+        This method checks if the cursor is on a side of the rectangle 5 pixels around. if it is, it returns the side of
+        the rectangle on which it is.
 
         :param e_pos: The position of the cursor.
         :return: The side of the rectangle the cursor is on.
@@ -137,7 +140,8 @@ class BitmapLabel(QLabel):
 
     def mousePressEvent(self, event):
         """
-        This method is called when the mouse is pressed. It sets the state of the action that is being performed.
+        This method is called when the mouse is pressed. It sets the state of the action that is being performed. The
+        action being the side of the rectangle on which the mouse is positioned.
 
         :param event: The mouse press event.
         :return: None
@@ -165,6 +169,7 @@ class BitmapLabel(QLabel):
     def mouseReleaseEvent(self, event):
         """
         This method is called when the mouse is released. It sets the values of the rectangle in its sample group box.
+        It also checks if the rectangle has the correct values.
 
         :param event: The event that occurred.
         :return: None
@@ -336,7 +341,7 @@ class BitmapLabel(QLabel):
         """
         This method sets the end point of the rectangle.
 
-        :para end: The end of the rectangle.
+        :param end: The end of the rectangle.
         :return: None
         """
 
@@ -344,7 +349,8 @@ class BitmapLabel(QLabel):
 
     def checkRectangleInImage(self, rectangle):
         """
-        This method checks if the rectangle is in the image and automatically puts it back in.
+        This method checks if the rectangle is in the image and automatically puts it back in. It updates the line edits
+        automatically.
 
         :param rectangle: The rectangle to check.
         :return: None

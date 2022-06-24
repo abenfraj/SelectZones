@@ -1,24 +1,40 @@
 from PyQt5 import QtCore
 
 
-# This class is used to track the mouse position and send it to the main window
 class MouseTracker(QtCore.QObject):
-    positionChanged = QtCore.pyqtSignal(QtCore.QPoint)  # Signal to send the mouse position to the main window
+    """
+    This is the class that sends the signal that is emitted when the mouse position changes.
+    """
+    positionChanged = QtCore.pyqtSignal(QtCore.QPoint)
 
-    # This class is used to draw the mouse position on the screen
     def __init__(self, widget):
-        super().__init__(widget)  # Call the parent class
-        self._widget = widget  # Store the widget
-        self.widget.setMouseTracking(True)  # Enable mouse tracking
-        self.widget.installEventFilter(self)  # Install the event filter
+        """
+        This is the constructor for the MouseTracker class.
+
+        :param widget: The widget that the mouse is being tracked on.
+        """
+        super().__init__(widget)
+        self._widget = widget
+        self.widget.setMouseTracking(True)
+        self.widget.installEventFilter(self)
 
     @property
-    # This property is used to get the mouse position
     def widget(self):
-        return self._widget  # Return the widget
+        """
+        This is the getter for the widget property.
 
-    # This method is used to filter the mouse events
+        :return: The widget that the mouse is being tracked on.
+        """
+        return self._widget
+
     def eventFilter(self, o, e):
-        if o is self.widget and e.type() == QtCore.QEvent.MouseMove:  # If the event is a mouse move event
-            self.positionChanged.emit(e.pos())  # Emit the signal with the mouse position
-        return super().eventFilter(o, e)  # Return the event
+        """
+        This is the event filter for the widget.
+
+        :param o: The object that the event is being sent to.
+        :param e: The event that is being sent.
+        :return: True if the event is handled, False if not.
+        """
+        if o is self.widget and e.type() == QtCore.QEvent.MouseMove:
+            self.positionChanged.emit(e.pos())
+        return super().eventFilter(o, e)
